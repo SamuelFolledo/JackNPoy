@@ -70,6 +70,7 @@ class Game {
         
 	}
 	
+    
     deinit {
 //        print("Game \(self.gameId) is being deinitialized")
     }
@@ -87,6 +88,19 @@ class Game {
 		return (player1Id == User.currentId() ? player2Id : player1Id)!
 	}
 	
+    func addGameToHistory(game: Game, completion: @escaping (_ value: String?)-> Void) {
+    //lastly, add it to GameHistory
+        let userGameHistoryRef = firDatabase.child(kGAMEHISTORY).child(User.currentId()).child(game.gameId)
+        userGameHistoryRef.setValue(gameDictionaryFrom(game: game)) { (error, ref) in
+            if let error = error {
+                completion(error.localizedDescription)
+            } else {
+                print("succesfully saved the game in kGAMEHISTORY")
+                completion(nil)
+            }
+        }
+        
+    }
     
 	func deleteGame(game: Game, completion: @escaping (_ value: String?)-> Void) {
 		let player1Ref = firDatabase.child(kUSERTOGAMESESSIONS).child(game.player1Id!).child(game.player2Id!)
@@ -109,6 +123,7 @@ class Game {
 			}
 		}
 		
+    //now remove it from gameSessions
 		let userToGameRef = firDatabase.child(kGAMESESSIONS).child(game.gameId)
 		userToGameRef.removeValue { (error, ref) in
 			if let error = error {
@@ -118,7 +133,10 @@ class Game {
 //				completion("Success")
 			}
 		}
-		completion(nil)
+        
+    
+        
+        completion(nil)
 	}
 	
 	internal func reset() {
@@ -152,7 +170,10 @@ class Game {
 //        print("\n\n\nUser dictionary of the user uploading gamae result = \(userDictionaryFrom(user: user))")
         
         let userUid = user.userID
-        let opponentUid: String = (game.player1Id == userUid ? game.player2Id : game.player1Id)!
+    
+        
+        
+        
         
         let userRef = firDatabase.child(kUSERS).child(userUid).child(kGAMESTATS)//NOW WORK ON PULLING WINNER/LOSER, EXPERIENCE, AND LEVEL
         print("save the game result from here")
@@ -220,22 +241,47 @@ class Game {
         
         
 //save in GameHistory Entity
-        let gameHistoryRef = firDatabase.child(kGAMEHISTORY).child(userUid).child(game.gameId)
-        let values: [String: String] = userUid == game.winnerUid ? [kRESULT: "W", kOPPONENTUID: opponentUid] : [kRESULT: "L", kOPPONENTUID: opponentUid]
+//        let opponentUid: String = (game.player1Id == userUid ? game.player2Id : game.player1Id)!
+        var opponentUid: String = ""
+        var opponentName: String = ""
+        var opponentAvatarUrl: String = ""
+        var hpLeft = 0
         
+        
+        if game.player1Id != userUid { //if current user is not player 1, then theyre p2
+            opponentUid = (game.player1Id)!
+            opponentName = (game.player1Name)!
+            opponentAvatarUrl = (game.player1AvatarUrl)!
+            hpLeft = (game.player2HP)
+        } else {
+            opponentUid = (game.player2Id)!
+            opponentName = (game.player2Name)!
+            opponentAvatarUrl = (game.player2AvatarUrl)!
+            hpLeft = (game.player1HP)
+        }
+        
+        
+//DISABLED FOR NOW
+        let gameHistoryRef = firDatabase.child(kGAMEHISTORY).child(userUid).child(game.gameId)
+        let resultValues: [String: Any] = userUid == game.winnerUid ? [kRESULT: "W", kOPPONENTUID: opponentUid, kOPPONENTNAME: opponentName, kOPPONENTAVATARTURL: opponentAvatarUrl, kHPLEFT: hpLeft] : [kRESULT: "L", kOPPONENTUID: opponentUid, kOPPONENTNAME: opponentName, kOPPONENTAVATARTURL: opponentAvatarUrl, kHPLEFT: hpLeft, kGAMEID: game.gameId]
+        
+        var gameValues = gameDictionaryFrom(game: game) as! Dictionary<String, Any>
+        resultValues.forEach {gameValues[$0] = $1}
+        
+        print("Result is \(resultValues)")
     //save it offline
-        UserDefaults.standard.set(values, forKey: game.gameId) //values needs lesser key-value pairs to store
+        UserDefaults.standard.set(resultValues, forKey: game.gameId) //values needs lesser key-value pairs to store
         UserDefaults.standard.synchronize()
         
     //save it online - setting the value in the reference
-        gameHistoryRef.setValue(values) { (error, ref) in
-            if let error = error {
-                completion(error.localizedDescription)
-            } else {
-                print("Finished saving the game in Game History")
-                //                completion(nil)
-            }
-        }
+//        gameHistoryRef.setValue(resultValues) { (error, ref) in //update game history reference
+//            if let error = error {
+//                completion(error.localizedDescription)
+//            } else {
+//                print("Finished saving the game in Game History")
+//                //                completion(nil)
+//            }
+//        }
         
         
         print("No error at all!!!")

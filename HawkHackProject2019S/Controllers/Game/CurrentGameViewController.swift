@@ -350,7 +350,7 @@ class CurrentGameViewController: UIViewController {
                 self.player1DamageLabel.isHidden = true
                 self.player2DamageLabel.isHidden = true
                 
-                if self.game?.winnerUid == nil {
+                if self.game?.winnerUid == nil || self.game?.winnerUid == "" {
                     self.finishTurn()
                     
                 } else { //if isGameOver is not nil

@@ -55,6 +55,10 @@ let kTIMESTAMP: String = "timeStamp"
 let kGAMEHISTORY: String = "gameHistory"
 //let kTURNCOUNTER: String = "turnCounter"
 
+let kOPPONENTNAME: String = "opponentName"
+let kOPPONENTAVATARTURL : String = "opponentAvatarUrl"
+let kHPLEFT: String = "hpLeft"
+
 //storyboard VC Identifiers
 let kHOMEVIEWCONTROLLER: String = "homeVC"
 let kPREGAMEVIEWCONTROLLER: String = "preGameVC"

@@ -128,8 +128,16 @@ class GameOverViewController: UIViewController {
             if let error = error {
                 Service.presentAlert(on: self, title: "Error Deleting", message: error)
             } else {
-                self.navigationController?.popToRootViewController(animated: true)
+                
 //                self.navigationController?.popToViewController(preGameVC, animated: true)
+            }
+        })
+        
+        game?.addGameToHistory(game: game!, completion: { (error) in
+            if let error = error {
+                Service.presentAlert(on: self, title: "Error Adding to History", message: error)
+            } else {
+                self.navigationController?.popToRootViewController(animated: true)
             }
         })
     }

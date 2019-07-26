@@ -520,6 +520,10 @@
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
+                                <connections>
+                                    <outlet property="dataSource" destination="ecW-rA-lcb" id="YWy-k5-yYa"/>
+                                    <outlet property="delegate" destination="ecW-rA-lcb" id="pvG-HE-CLR"/>
+                                </connections>
                             </tableView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Previous Matches" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="y69-Cb-iKU">
                                 <rect key="frame" x="192.66666666666666" y="156" width="114.66666666666666" height="17"/>

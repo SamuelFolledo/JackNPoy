@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import FirebaseDatabase
+import Firebase
 
 class GameHistoryViewController: UIViewController {
     
@@ -24,7 +26,8 @@ class GameHistoryViewController: UIViewController {
 //MARK: Properties
     let shapeLayer = CAShapeLayer() //for expBar
     var matches:[Game] = []
-    
+//    var gameHistory: [] = []
+    var gameIds:[String] = []
 //MARK: LifeCycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,8 +42,56 @@ class GameHistoryViewController: UIViewController {
     
     func setupGameHistoryTable() {
         
+//        gameHistoryTableView.register(UINib(nibName: "GameHistoryTableViewCell", bundle: nil), forCellReuseIdentifier: "gameHistoryCell")
+        gameHistoryTableView.delegate = self
+        gameHistoryTableView.dataSource = self
+        gameHistoryTableView.tableFooterView = UIView(frame: .zero)
+        
+        fetchResults()
         
         
+    }
+    
+    func fetchResults() {
+        let gameHistoryRef = firDatabase.child(kGAMEHISTORY).child(User.currentId())
+        gameHistoryRef.observe(.childAdded, with: { (snapshot) in
+//            print("Snapshots are... \(snapshot.children.allObjects)")
+            if snapshot.exists() {
+                guard let gameHistoryDic = snapshot.value as? [String: Any] else { print("fetchResult has no gameHistory exisit"); return } //will contain the gameHistoryDic that has the keys: kOPPONENTUID, kOPPONENTAVATARTURL, kHPLEFT, kGAMEID etc.
+                print("GameDic is \(gameHistoryDic)")
+
+                let game: Game = Game.init(_dictionary: gameHistoryDic) //create then append each game in matches
+                self.matches.append(game)
+//                for case let gameSnapshot as DataSnapshot in snapshot.children { //loop through each snapshot, meaning each gameId and its children (which is a dictionary that contains the value of the keys kRESULT and kOPPONENTUID)
+//                    print("gameSnapshot is...\(gameSnapshot.value)")
+//                    print(gameSnapshot.value)
+//                    
+//                    guard let gameId: String = gameSnapshot.value as? String else { print("no gameSnapshot.value in gameHistory"); return }
+//                
+//                    gameHistoryRef.child(gameId).observe(.childAdded, with: { (snapshot) in
+//
+//                        guard let gameDic = gameSnapshot.value as? [String: Any] else { print("No game dic found from fetchResult"); return } //dictionary that contains the value for our keys: kRESULT and kOPPONENTUID
+//                        guard let result: String = gameDic[kRESULT] as? String else { print("Result not found"); return }
+//                        guard let opponentUid: String = gameDic[kOPPONENTUID] as? String else { return }
+//                        print("Result is \(result)")
+//
+//
+//
+//                    }, withCancel: nil)
+//                
+//                
+//                
+//                for gameSnapshot in snapshot.children.allObjects as! [d] {
+//
+//                }
+//                guard let gameIdArray = snapshot.children.allObjects as? [String] else { print("No gameIds"); return }
+//                guard let gameHistoryDic = snapshot.value as? [String: Any] else { return }
+//                for gameId in gameIdArray {
+//                    print(gameId)
+//                }
+            }
+            self.gameHistoryTableView.reloadData()
+        }, withCancel: nil)
     }
     
 //MARK: Helper Methods
@@ -129,14 +180,14 @@ class GameHistoryViewController: UIViewController {
 
 extension GameHistoryViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
+        return matches.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: GameHistoryTableViewCell = tableView.dequeueReusableCell(withIdentifier: "gameHistoryCell", for: indexPath) as! GameHistoryTableViewCell
+        let cell: GameHistoryTableViewCell = gameHistoryTableView.dequeueReusableCell(withIdentifier: "gameHistoryCell", for: indexPath) as! GameHistoryTableViewCell
         //cell.setCellData(game: matches[indexPath]) //need at least matches
-        
-        return UITableViewCell()
+        cell.setCellData(game: matches[indexPath.row])
+        return cell
     }
     
     
