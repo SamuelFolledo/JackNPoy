@@ -164,7 +164,7 @@ class CurrentGameViewController: UIViewController {
                 Service.presentAlert(on: self, title: "Error", message: error)
                 return
             } else {
-                print("\n\nGame is \(gameDictionaryFrom(game: self.game!))\n\n")
+//                print("\n\nGame is \(gameDictionaryFrom(game: self.game!))\n\n")
             }
         }
 		startTurnTimer()
@@ -318,7 +318,7 @@ class CurrentGameViewController: UIViewController {
 //        self.roundNumberLabel.text = "\(game?.roundNumber)"
         player1IsFirstImageView.isHidden = !p1HasSpeedBoost //if p1IsFirstImageView will be hidden if p1HasSpeedBoost == false
         player2IsFirstImageView.isHidden = p1HasSpeedBoost
-        print("p1 is hidden  = \(!p1HasSpeedBoost)\np2 is hidden = \(!p1HasSpeedBoost)")
+        print("p1 is hidden  = \(!p1HasSpeedBoost)\np2 is hidden = \(p1HasSpeedBoost)")
         
         if p1HasSpeedBoost {
 //            player1IsFirstImageView.isHidden = false
@@ -358,7 +358,7 @@ class CurrentGameViewController: UIViewController {
                     self.gameOver() //pass either if p1 or p2 wins
                 }
             })
-            return
+//            return
             
         } else { //if we are playing against someone online...
             if User.currentId() == self.game?.player1Id { //if our current user is p1 then upload p1's selectedTag and fetch p2's selectedTag
@@ -395,6 +395,7 @@ class CurrentGameViewController: UIViewController {
         ref.observe(.value, with: { (snapshot) in
             print("Hey something was added at currentGame turn #\(self.game!.roundNumber)")
             if snapshot.exists() && snapshot.childrenCount == 4 { //if it exist and it has 4 children (p1Move, p1Attack, p2Move, p2Attack)...
+                ref.removeAllObservers() // if snapshot is acceptable then remove the observer and the timer
                 self.fetchingOpponentMoveTimer?.invalidate()
                 //            let userDictionary = ((snapshot.value as! NSDictionary).allValues as NSArray).firstObject! as! [String: AnyObject]
 //                print("SNAPSHOT is \(snapshot)")
@@ -403,7 +404,7 @@ class CurrentGameViewController: UIViewController {
 //                    print("2")
                     return
                 }
-//                print("Result Dic is \(resultDic)")
+                print("Result Dic is \(resultDic)")
                 guard let fetchedOpponentMove = resultDic["\(p1OrP2String)MoveTag"] as? Int else {
                     print("No opponentMove found");
                     return
@@ -412,8 +413,8 @@ class CurrentGameViewController: UIViewController {
                 
                 
                 if p1OrP2String == "p1" {
-                    self.player1TagSelected = (fetchedOpponentMove, fetchedOpponentAttack)
-                    for button in self.player1AttackButtons! where self.player1TagSelected.attack == button.buttonTag {
+                    self.player1TagSelected = (fetchedOpponentMove, fetchedOpponentAttack) //assign our fetched opponentMove to our p1
+                    for button in self.player1AttackButtons! where self.player1TagSelected.attack == button.buttonTag { //declare that they are a selected button
                         button.selectedButton = true
                     }
                     for button in self.player1MoveButtons! where self.player1TagSelected.move == button.buttonTag {
@@ -436,20 +437,22 @@ class CurrentGameViewController: UIViewController {
                     self.player1DamageLabel.isHidden = true //hide hp damage label
                     self.player2DamageLabel.isHidden = true
                     
-                    if self.game?.winnerUid == nil { //if winnerUid is nil then continue the turn cuz game is not over
-                        if self.player1TagSelected == (nil, nil) || self.player2TagSelected == (nil, nil) {
-                            print("Player1 or Player 2 Tag is nil")
-                        } else {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                print("applied damage to views")
-                                self.finishTurn()
-                            }
-                        }
+                    if self.game?.winnerUid == nil || self.game?.winnerUid == "" { //if winnerUid is nil then continue the turn cuz game is not over
+//                        if self.player1TagSelected == (nil, nil) || self.player2TagSelected == (nil, nil) {
+//                            print("Player1 or Player 2 Tag is nil")
+//                        } else {
+//                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+//                                print("applied damage to views")
+//                                self.finishTurn()
+//                            }
+//                        }
+                        self.finishTurn()
+                        
                     } else { //if we have a game.winnerUid!!! so game over
                         self.player1HPLabel.text = self.game?.player1Id == self.game?.winnerUid ? "WIN!" : "LOSE"
                         self.player2HPLabel.text = self.game?.player2Id == self.game?.winnerUid ? "WIN!": "LOSE"
 //                        self.game?.winnerUid = didP1Win == true ? self.game?.player1Id : self.game?.player2Id //assign the game's winnerUid to p1 or p2
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: { //delay
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5, execute: { //delay
 //                            print("we have results! \(self.game?.winnerUid)")
                             self.gameOver() //run gameOver
                         })
@@ -460,18 +463,14 @@ class CurrentGameViewController: UIViewController {
             } else { //snapshot dont exist or not all 4 moves are available
                 self.player1MovesView.isUserInteractionEnabled = false
                 self.player2MovesView.isUserInteractionEnabled = false
-                self.scheduledTimerWithTimeInterval()
+                self.fetchingOpponentMoveTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.updateCounting), userInfo: nil, repeats: true)// Scheduling timer to Call the function "updateCounting" with the interval of 1 seconds
             }
         }, withCancel: nil)
     }
     
     
-    func scheduledTimerWithTimeInterval(){
-        // Scheduling timer to Call the function "updateCounting" with the interval of 1 seconds
-        fetchingOpponentMoveTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateCounting), userInfo: nil, repeats: true)
-    }
     @objc func updateCounting() {
-        print("counting...")
+        print("waiting for opponent's move...")
     }
 	
     private func applyDamagesToViews(completion: @escaping () -> Void) { //or () -> ()
@@ -481,7 +480,7 @@ class CurrentGameViewController: UIViewController {
         
         ryuCounter = 0
         
-        updateCurrentGame(game: game!, withValues: ["round\(game!.roundNumber)": [game!.roundNumber, player1TagSelected.move, player1TagSelected.attack, player2TagSelected.move, player2TagSelected.attack]]) { (error) in
+        updateCurrentGame(game: game!, withValues: ["round\(game!.roundNumber)": [player1TagSelected.move, player1TagSelected.attack, player2TagSelected.move, player2TagSelected.attack]]) { (error) in //update this sht
             if let error = error {
                 Service.presentAlert(on: self, title: "Updating Round Error", message: error)
                 return
@@ -573,6 +572,18 @@ class CurrentGameViewController: UIViewController {
             } else { //if p1 dies
                 game?.winnerUid = game?.player2Id
 //                completion(false)
+            }
+        }
+        
+        
+        let userHP: [String: Int] = User.currentId() == game?.player1Id ? ["player1Hp": game!.player1HP] : ["player2Hp":game!.player2HP]
+        
+        updateCurrentGame(game: game!, withValues: userHP) { (error) in
+            if let error = error {
+                Service.presentAlert(on: self, title: "Error Updating Current Game", message: error)
+                return
+            } else {
+                print("Players HP updated successfully")
             }
         }
         

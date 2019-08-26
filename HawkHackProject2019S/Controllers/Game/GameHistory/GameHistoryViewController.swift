@@ -52,43 +52,22 @@ class GameHistoryViewController: UIViewController {
         
     }
     
+//MARK: Fetch Game History Results
     func fetchResults() {
-        let gameHistoryRef = firDatabase.child(kGAMEHISTORY).child(User.currentId())
+        guard let currentUser = User.currentUser() else { print("No logged in user"); return }
+        
+        self.matches.removeAll()
+        
+        let gameHistoryRef = firDatabase.child(kGAMEHISTORY).child(currentUser.userID)
         gameHistoryRef.observe(.childAdded, with: { (snapshot) in
 //            print("Snapshots are... \(snapshot.children.allObjects)")
+            
             if snapshot.exists() {
                 guard let gameHistoryDic = snapshot.value as? [String: Any] else { print("fetchResult has no gameHistory exisit"); return } //will contain the gameHistoryDic that has the keys: kOPPONENTUID, kOPPONENTAVATARTURL, kHPLEFT, kGAMEID etc.
                 print("GameDic is \(gameHistoryDic)")
 
                 let game: Game = Game.init(_dictionary: gameHistoryDic) //create then append each game in matches
                 self.matches.append(game)
-//                for case let gameSnapshot as DataSnapshot in snapshot.children { //loop through each snapshot, meaning each gameId and its children (which is a dictionary that contains the value of the keys kRESULT and kOPPONENTUID)
-//                    print("gameSnapshot is...\(gameSnapshot.value)")
-//                    print(gameSnapshot.value)
-//                    
-//                    guard let gameId: String = gameSnapshot.value as? String else { print("no gameSnapshot.value in gameHistory"); return }
-//                
-//                    gameHistoryRef.child(gameId).observe(.childAdded, with: { (snapshot) in
-//
-//                        guard let gameDic = gameSnapshot.value as? [String: Any] else { print("No game dic found from fetchResult"); return } //dictionary that contains the value for our keys: kRESULT and kOPPONENTUID
-//                        guard let result: String = gameDic[kRESULT] as? String else { print("Result not found"); return }
-//                        guard let opponentUid: String = gameDic[kOPPONENTUID] as? String else { return }
-//                        print("Result is \(result)")
-//
-//
-//
-//                    }, withCancel: nil)
-//                
-//                
-//                
-//                for gameSnapshot in snapshot.children.allObjects as! [d] {
-//
-//                }
-//                guard let gameIdArray = snapshot.children.allObjects as? [String] else { print("No gameIds"); return }
-//                guard let gameHistoryDic = snapshot.value as? [String: Any] else { return }
-//                for gameId in gameIdArray {
-//                    print(gameId)
-//                }
             }
             self.gameHistoryTableView.reloadData()
         }, withCancel: nil)
@@ -168,6 +147,7 @@ class GameHistoryViewController: UIViewController {
     
     @IBAction func refreshButtonTapped(_ sender: Any) {
         setupViews()
+        fetchResults()
     }
     
     @IBAction func cameraButtonTapped(_ sender: Any) {

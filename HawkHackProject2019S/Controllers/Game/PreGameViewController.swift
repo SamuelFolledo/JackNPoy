@@ -19,10 +19,11 @@ class PreGameViewController: UIViewController {
 	//MARK: IBOutlets
 	@IBOutlet weak var helloLabel: UILabel!
 	@IBOutlet weak var emailTextField: UITextField!
-	@IBOutlet weak var topButton: UIButton!
-	@IBOutlet weak var matchesTableView: UITableView!
-	
-	
+	@IBOutlet weak var topButton: UIButton! //invite other players button
+    @IBOutlet weak var matchHistoryButton: UIButton!
+    @IBOutlet weak var matchesTableView: UITableView!
+    
+    
 	//MARK: Properties
 	var game = Game.sharedInstance
 	var users = [User]()
@@ -47,7 +48,7 @@ class PreGameViewController: UIViewController {
 		
 		fetchUsers()
 		
-		disableButton(button: topButton)
+        disableView(view: topButton)
 		
 		if isUserLoggedIn() {
 			incomingRequest()
@@ -60,10 +61,15 @@ class PreGameViewController: UIViewController {
 		
 		if User.currentUser() == nil {
 			helloLabel.text = "Please login or register in order to play a game"
-			disableButton(button: topButton)
+            disableView(view: topButton)
+            disableView(view: matchHistoryButton)
+            disableView(view: emailTextField)
 		} else {
 			helloLabel.text = "Hello \(User.currentUser()!.name). Enter the email you would like to play against and click the invite button."
-			enableButton(button: topButton)
+            enableView(view: topButton)
+            enableView(view: matchHistoryButton)
+            enableView(view: emailTextField)
+            incomingRequest()
 		}
 		
 	}
@@ -274,13 +280,13 @@ class PreGameViewController: UIViewController {
 		self.view.endEditing(true)
 	}
 	
-	private func disableButton(button: UIButton) {
-		button.alpha = 0.2
-		button.isEnabled = false
+	private func disableView(view: UIView) {
+		view.alpha = 0.2
+		view.isUserInteractionEnabled = false
 	}
-	private func enableButton(button: UIButton) {
-		button.alpha = 1
-		button.isEnabled = true
+	private func enableView(view: UIView) {
+		view.alpha = 1
+		view.isUserInteractionEnabled = true
 	}
 	
 	

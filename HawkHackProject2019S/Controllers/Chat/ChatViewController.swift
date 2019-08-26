@@ -168,8 +168,11 @@ extension ChatViewController: UITableViewDelegate, UITableViewDataSource {
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		
 		let cell = tableView.dequeueReusableCell(withIdentifier: "chatCell", for: indexPath) as! ChatTableViewCell
-		cell.setCellData(message: messages![indexPath.row])
-		return cell
+        guard let msg = messages else { print("no message cell"); return UITableViewCell() }
+        
+        cell.setCellData(message: msg[indexPath.row])
+        return cell
+        
 	}
 	
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

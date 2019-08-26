@@ -36,7 +36,7 @@
                                     <outlet property="delegate" destination="2lx-iZ-x0R" id="FPC-sO-4Jq"/>
                                 </connections>
                             </tableView>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ynG-l2-j6h">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ynG-l2-j6h" userLabel="sendMessage View">
                                 <rect key="frame" x="0.0" y="364" width="736" height="50"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ehD-jC-PTP" userLabel="separatorView">
@@ -694,6 +694,7 @@
                     <connections>
                         <outlet property="emailTextField" destination="H0a-Eu-iXh" id="zFj-RA-6TH"/>
                         <outlet property="helloLabel" destination="OtW-p0-OZh" id="nfz-gS-gRf"/>
+                        <outlet property="matchHistoryButton" destination="aNS-Yw-cuZ" id="lPP-w1-ZO7"/>
                         <outlet property="matchesTableView" destination="Ax3-nn-MBr" id="cQd-mS-IrN"/>
                         <outlet property="topButton" destination="5N3-ba-aZS" id="Anb-n2-fLG"/>
                         <segue destination="bUN-KP-xA1" kind="show" identifier="preGameToGameSegue" id="Njr-gD-Il9"/>

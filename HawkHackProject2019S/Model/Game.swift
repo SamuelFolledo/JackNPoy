@@ -500,8 +500,10 @@ func updateCurrentGame(game: Game, withValues: [String : Any], withBlock: @escap
         return
     }
     gameObject.setValuesForKeys(withValues)
+    print("Game object from updateCurrentGame is \(gameObject)")
     
-    let ref = firDatabase.child(kGAMESESSIONS).child(game.gameId)
+    let ref = firDatabase.child(kGAMESESSIONS).child(game.gameId).child(kCURRENTGAME)
+    
     ref.updateChildValues(withValues) { (error, ref) in
         if let error = error {
             withBlock(error.localizedDescription)
