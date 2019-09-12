@@ -11,7 +11,7 @@ import UIKit
 import FirebaseDatabase
 
 //ids and keys for one signal
-public let kONESIGNALAPPID: String = "56b0898f-a888-42f3-8208-7c58fe1e785d"
+public let kONESIGNALAPPID: String = "586d3ef3-6411-41d0-ab81-2a797a16a50b"
 public let kONESIGNALID: String = "OneSignalId"
 let kUSERID: String = "userID"
 let kNAME: String = "name"
