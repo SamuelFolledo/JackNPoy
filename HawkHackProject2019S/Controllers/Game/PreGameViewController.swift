@@ -20,8 +20,8 @@ class PreGameViewController: UIViewController {
 	@IBOutlet weak var helloLabel: UILabel!
 	@IBOutlet weak var emailTextField: UITextField!
 	@IBOutlet weak var topButton: UIButton! //invite other players button
+	@IBOutlet weak var matchesTableView: UITableView!
     @IBOutlet weak var matchHistoryButton: UIButton!
-    @IBOutlet weak var matchesTableView: UITableView!
     
     
 	//MARK: Properties
@@ -48,7 +48,7 @@ class PreGameViewController: UIViewController {
 		
 		fetchUsers()
 		
-        disableView(view: topButton)
+		disableButton(button: topButton)
 		
 		if isUserLoggedIn() {
 			incomingRequest()
@@ -61,17 +61,16 @@ class PreGameViewController: UIViewController {
 		
 		if User.currentUser() == nil {
 			helloLabel.text = "Please login or register in order to play a game"
-            disableView(view: topButton)
-            disableView(view: matchHistoryButton)
-            disableView(view: emailTextField)
+			disableButton(button: topButton)
+            disableButton(button: matchHistoryButton)
 		} else {
+            if isUserLoggedIn() {
+                incomingRequest()
+            }
 			helloLabel.text = "Hello \(User.currentUser()!.name). Enter the email you would like to play against and click the invite button."
-            enableView(view: topButton)
-            enableView(view: matchHistoryButton)
-            enableView(view: emailTextField)
-            incomingRequest()
+			enableButton(button: topButton)
+            enableButton(button: matchHistoryButton)
 		}
-		
 	}
 	
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -161,7 +160,7 @@ class PreGameViewController: UIViewController {
         var gameValues: [String: AnyObject] = [kCREATEDAT: timeStamp, kUPDATEDAT: timeStamp, kGAMEID: gameId] as [String: AnyObject] //values for our game session on top of each users's infos
         
 		properties.forEach {gameValues[$0] = $1}
-//        print("Game values is created. Recommended to also save this in Core Data \(gameValues)")
+        print("Game values is created. Recommended to also save this in Core Data \(gameValues)")
         
         
         
@@ -224,24 +223,67 @@ class PreGameViewController: UIViewController {
 	func gameUidsToGame(gameUidDictionary: [String: AnyObject]) {
 		//		print("\n\n\nKeys are\(gameUidDictionary.keys)\nValues are\(gameUidDictionary.values)\n\n\n")
         self.matches.removeAll()
-		for key in gameUidDictionary.keys {
+        for key in gameUidDictionary.keys { //Only get the key because it is the gameSessionId as a key in a dictionary as this type, [gameSessionId: 0].
 			
-			fetchGameWith(gameSessionId: key, completion: { (game) in
+			fetchGameWith(gameSessionId: key, completion: { (game) in //with the game uid, call our fetchGame function
 				DispatchQueue.main.async {
 //                    self.matches.removeAll()
+                    if let game = game {
                     
-					guard let game = game else { return }
-                    
-                    print("Fetched game found = \(game)")
-					
-					self.matches.append(game)
-					self.matchesTableView.reloadData()
+                        print("Fetched game found = \(game)")
+                        self.matches.append(game) //append the game we found
+                        self.matchesTableView.reloadData() //reload table
+                    } else {
+//                        self.matchesTableView.reloadData() //don't do this or it wont load any games
+                    }
 				}
 			})
 		}
 		
 	}
 	
+    /*
+     ryu introduction  = https://media.giphy.com/media/RPX59UHW0kTOE/giphy.gif
+     ryu crouch =
+     https://media.giphy.com/media/mDY5oRfRKxhu/giphy.gif
+     
+     ryu jump = http://wiki.shoryuken.com/images/e/e1/%28ryujump%29.gif
+     
+//high punch
+     ryu high light punch = https://media1.giphy.com/media/thfWGJWuxPXqg/200.webp?cid=790b7611d0683cb0f6fa20d198ed88279e43bf58e85ae042&rid=200.webp
+     
+     ryu high medium punch = https://media2.giphy.com/media/H5hqxjK6eGeFa/200.webp?cid=790b7611cdc459e41aa1be4ee6f75ce2dee335ee56fb1946&rid=200.webp
+     ryu high hard punch =
+     https://media.giphy.com/media/zGLwWJPJzhWV2/giphy.gif
+     
+     
+//low punch
+     ryu low medium punch = http://people.cs.vt.edu/fiqbal/handlebar/reference-sprites/ryu-punch-02.gif
+     ryu low medium punch = https://media3.giphy.com/media/HD4BNrroZa3Oo/200w.webp?cid=790b76117f9f8bb78cf3522ae616598253e319b03b6d5780&rid=200w.webp
+     
+     ryu low hard punch = http://wiki.shoryuken.com/images/e/ee/Ryu_f.mp.gif
+     
+     
+//high kick
+     ryu high light kick = https://media.giphy.com/media/ShFXWoVRzzkVG/giphy.gif
+     
+     ryu high medium kick = https://media.giphy.com/media/UZ66rWaC2BXP2/200.gif
+     
+     ryu high hard kick = https://media0.giphy.com/media/jA8QFjEjjaHyo/200.webp?cid=790b7611d0683cb0f6fa20d198ed88279e43bf58e85ae042&rid=200.webp
+     
+//low kick
+     ryu low light kick =
+     https://vignette.wikia.nocookie.net/streetfighter/images/4/49/RyuLK.gif/revision/latest?cb=20140308155001
+     
+     
+     ryu low medium kick https://media0.giphy.com/media/2wOO6Zaq1zs3u/200.webp?cid=790b7611d0683cb0f6fa20d198ed88279e43bf58e85ae042&rid=200.webp
+     
+     ryu low hard kick = https://www.fightersgeneration.com/characters3/ryu-crouch-hk.gif
+     
+     
+     
+     */
+    
 	
 //MARK: Helper private methods
 	private func fetchUsers() {
@@ -280,13 +322,13 @@ class PreGameViewController: UIViewController {
 		self.view.endEditing(true)
 	}
 	
-	private func disableView(view: UIView) {
-		view.alpha = 0.2
-		view.isUserInteractionEnabled = false
+	private func disableButton(button: UIButton) {
+		button.alpha = 0.2
+		button.isEnabled = false
 	}
-	private func enableView(view: UIView) {
-		view.alpha = 1
-		view.isUserInteractionEnabled = true
+	private func enableButton(button: UIButton) {
+		button.alpha = 1
+		button.isEnabled = true
 	}
 	
 	
@@ -311,7 +353,6 @@ extension PreGameViewController: UITableViewDelegate, UITableViewDataSource {
 		cell.indexPath = indexPath
 		cell.setCellData(game: match)
 		cell.delegate = self
-        
 		return cell
 	}
 	
@@ -319,8 +360,8 @@ extension PreGameViewController: UITableViewDelegate, UITableViewDataSource {
 
 //MatchesTableViewCellDelegate Methods
 extension PreGameViewController: MatchesTableViewCellDelegate {
-    func segueWithGameUid(withGame game: Game) {
-        
+    func segueWithGameUid(withGame game: Game) { //it's a delegate method for segueing a game
+        print("Segueing to game \(gameDictionaryFrom(game: game))")
         if let gameDictionary = UserDefaults.standard.object(forKey: game.gameId) as? [String: Any] { //if game was saved before
             print("Game has been played before = \(gameDictionary)")
             let currentGame: Game = Game.init(_dictionary: gameDictionary)

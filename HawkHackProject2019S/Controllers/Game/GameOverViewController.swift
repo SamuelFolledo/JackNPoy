@@ -145,11 +145,11 @@ class GameOverViewController: UIViewController {
     @IBAction func yesButtonTapped(_ sender: Any) {
         
         let userId = User.currentId()
-//        let opponentUid = userId == game!.player1Id ? game!.player2Id : game!.player1Id //opponentUid if currentUserId is == p1Id, then opponentUid is p2Id, else p1Id
-//        
-//        fetchOpponentUserWith(opponentUid: opponentUid!) { (opponentUser) in
-//            
-//        }
+        let opponentUid = userId == game!.player1Id ? game!.player2Id : game!.player1Id //opponentUid if currentUserId is == p1Id, then opponentUid is p2Id, else p1Id
+        
+        fetchOpponentUserWith(opponentUid: opponentUid!) { (opponentUser) in
+            
+        }
         
         self.navigationController?.popViewController(animated: true)
     }

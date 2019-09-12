@@ -157,8 +157,8 @@ class CurrentGameViewController: UIViewController {
 		
         game?.roundNumber = 1 //make game's roundNumber = 1 and update offline and online
         UserDefaults.standard.set(gameDictionaryFrom(game: game!), forKey: game!.gameId)
-        UserDefaults.standard.synchronize()
-        self.roundNumberLabel.text = "\(game!.roundNumber)"
+        UserDefaults.standard.synchronize() //saving it locally
+        self.roundNumberLabel.text = "\(game!.roundNumber)" //present it to the user
         updateCurrentGame(game: game!, withValues: [kROUNDNUMBER: game!.roundNumber]) { (error) in
             if let error = error {
                 Service.presentAlert(on: self, title: "Error", message: error)

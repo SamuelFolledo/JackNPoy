@@ -578,10 +578,10 @@
             </objects>
             <point key="canvasLocation" x="1894.5652173913045" y="-1494.2028985507247"/>
         </scene>
-        <!--Pre Game View Controller-->
+        <!--Pre Game-->
         <scene sceneID="cUl-OF-6KF">
             <objects>
-                <viewController storyboardIdentifier="preGameVC" id="B9U-rl-Vff" customClass="PreGameViewController" customModule="HawkHackProject2019S" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="preGameVC" title="Pre Game" id="B9U-rl-Vff" customClass="PreGameViewController" customModule="HawkHackProject2019S" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="2fI-Dc-lNg">
                         <rect key="frame" x="0.0" y="0.0" width="736" height="414"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

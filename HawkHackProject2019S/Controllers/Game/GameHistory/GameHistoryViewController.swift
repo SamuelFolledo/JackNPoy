@@ -64,7 +64,7 @@ class GameHistoryViewController: UIViewController {
             
             if snapshot.exists() {
                 guard let gameHistoryDic = snapshot.value as? [String: Any] else { print("fetchResult has no gameHistory exisit"); return } //will contain the gameHistoryDic that has the keys: kOPPONENTUID, kOPPONENTAVATARTURL, kHPLEFT, kGAMEID etc.
-                print("GameDic is \(gameHistoryDic)")
+//                print("GameDic is \(gameHistoryDic)")
 
                 let game: Game = Game.init(_dictionary: gameHistoryDic) //create then append each game in matches
                 self.matches.append(game)
