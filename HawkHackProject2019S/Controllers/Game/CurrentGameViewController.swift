@@ -1111,12 +1111,14 @@ class CurrentGameViewController: UIViewController {
         }
     }
 	
-	@objc func ryuStandingAnimation() {
+	@objc func ryuStandingAnimation() { //method that gets run every 0.1 seconds and animates player1Character (ryu) depending on the assigned ryuImageName
+        
+//        self.player1Character.image = UIImage.animatedImage(with: <#T##[UIImage]#>, duration: <#T##TimeInterval#>)
 		self.player1Character.image = UIImage(named: "\(ryuImageName.0)\(ryuCounter)")
 		ryuCounter += 1
-		if ryuCounter == ryuImageName.1 {
+		if ryuCounter == ryuImageName.1 { //if ryuCounter has reached the image's max amount of frames then set it back to 0
 			ryuCounter = 0
-			if ryuImageName != RyuAnimationName.Standing {
+			if ryuImageName != RyuAnimationName.Standing { //this ensures any animation is ran once
 				ryuImageName = RyuAnimationName.Standing
 			}
 		}

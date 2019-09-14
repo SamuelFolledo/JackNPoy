@@ -251,7 +251,7 @@ func fetchUserWith(userId: String, completion: @escaping (_ user: User?) -> Void
 func userDictionaryFrom(user: User) -> NSDictionary { //take a user and return an NSDictionary
 	
 	return NSDictionary(
-        objects: [user.userID, user.pushId, user.name, user.email, user.avatarURL, user.wins!, user.loses!, user.matchesDictionary ?? [""], user.matchesUid ?? [""], user.experience, user.level],
+        objects: [user.userID, user.pushId!, user.name, user.email, user.avatarURL, user.wins!, user.loses!, user.matchesDictionary ?? [""], user.matchesUid ?? [""], user.experience, user.level],
         forKeys: [kUSERID as NSCopying, kPUSHID as NSCopying, kNAME as NSCopying, kEMAIL as NSCopying, kAVATARURL as NSCopying, kWINS as NSCopying, kLOSES as NSCopying, kMATCHESDICTIONARY as NSCopying, kMATCHESUID as NSCopying, kEXPERIENCES as NSCopying, kLEVEL as NSCopying]) //this func create and return an NSDictionary
 }
 

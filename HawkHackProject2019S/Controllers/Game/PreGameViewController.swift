@@ -343,43 +343,69 @@ extension PreGameViewController: MatchesTableViewCellDelegate {
 
 
 /* //Animation REFERENCES
+ ryu = http://wiki.shoryuken.com/Ryu_(3S)
  ryu introduction  = https://media.giphy.com/media/RPX59UHW0kTOE/giphy.gif
- ryu crouch =
- https://media.giphy.com/media/mDY5oRfRKxhu/giphy.gif
- 
+ ryu crouch = https://media.giphy.com/media/mDY5oRfRKxhu/giphy.gif
  ryu jump = http://wiki.shoryuken.com/images/e/e1/%28ryujump%29.gif
  
  //high punch
- ryu high light punch = https://media1.giphy.com/media/thfWGJWuxPXqg/200.webp?cid=790b7611d0683cb0f6fa20d198ed88279e43bf58e85ae042&rid=200.webp
- 
- ryu high medium punch = https://media2.giphy.com/media/H5hqxjK6eGeFa/200.webp?cid=790b7611cdc459e41aa1be4ee6f75ce2dee335ee56fb1946&rid=200.webp
- ryu high hard punch =
- https://media.giphy.com/media/zGLwWJPJzhWV2/giphy.gif
+ ryu high light punch = http://wiki.shoryuken.com/images/1/13/%28ryulp%29.gif
+ ryu high medium punch = http://wiki.shoryuken.com/images/6/69/%28ryump%29.gif
+ ryu high hard punch = http://wiki.shoryuken.com/images/a/ae/%28ryuhp%29.gif
  
  
  //low punch
- ryu low medium punch = http://people.cs.vt.edu/fiqbal/handlebar/reference-sprites/ryu-punch-02.gif
- ryu low medium punch = https://media3.giphy.com/media/HD4BNrroZa3Oo/200w.webp?cid=790b76117f9f8bb78cf3522ae616598253e319b03b6d5780&rid=200w.webp
+ ryu low light punch = http://wiki.shoryuken.com/images/9/9b/%28ryucmp%29.gif
+ ryu low medium punch = http://wiki.shoryuken.com/images/4/48/%28ryuchp%29.gif
+ ryu low hard punch = http://wiki.shoryuken.com/images/6/60/%28ryufmp%29.gif
  
- ryu low hard punch = http://wiki.shoryuken.com/images/e/ee/Ryu_f.mp.gif
- 
+ ryu punch high finisher = http://wiki.shoryuken.com/images/6/62/%28ryusrkex%29.gif
+ ryu punch low finisher = http://wiki.shoryuken.com/images/1/17/%28ryuhdkex%29.gif
  
  //high kick
- ryu high light kick = https://media.giphy.com/media/ShFXWoVRzzkVG/giphy.gif
- 
- ryu high medium kick = https://media.giphy.com/media/UZ66rWaC2BXP2/200.gif
- 
- ryu high hard kick = https://media0.giphy.com/media/jA8QFjEjjaHyo/200.webp?cid=790b7611d0683cb0f6fa20d198ed88279e43bf58e85ae042&rid=200.webp
+ ryu high light kick = http://wiki.shoryuken.com/images/8/8a/%28ryumk%29.gif
+ ryu high medium kick = http://wiki.shoryuken.com/images/5/55/%28ryuhk%29.gif
+ ryu high hard kick = http://wiki.shoryuken.com/images/f/f9/%28ryutsk%29.gif
  
  //low kick
- ryu low light kick =
- https://vignette.wikia.nocookie.net/streetfighter/images/4/49/RyuLK.gif/revision/latest?cb=20140308155001
+ ryu low light kick = http://wiki.shoryuken.com/images/9/99/%28ryulk%29.gif
+ ryu low medium kick = http://wiki.shoryuken.com/images/f/ff/%28ryucmk%29.gif
+ ryu low hard kick = http://wiki.shoryuken.com/images/4/4f/%28ryuchk%29.gif
+
+ ryu kick high finisher = http://wiki.shoryuken.com/images/3/3b/%28ryuatskex%29.gif
+ ryu kick low finisher = http://wiki.shoryuken.com/images/1/1e/%28ryujsgex%29.gif
+
+ ---------------------------------------------------------------------------
+ 
+ Ken = http://wiki.shoryuken.com/Ken_(3S)
+ Ken introduction  = http://wiki.shoryuken.com/images/8/8d/%28kent%29.gif
+ Ken crouch =
+ Ken jump = http://wiki.shoryuken.com/images/5/5f/%28kenjump%29.gif
+ 
+ //high punch
+ ryu high light punch = http://wiki.shoryuken.com/images/5/5a/%28kenlp%29.gif
+ ryu high medium punch = http://wiki.shoryuken.com/images/f/f4/%28kenmp%29.gif
+ ryu high hard punch = http://wiki.shoryuken.com/images/e/e1/%28kenhp%29.gif
  
  
- ryu low medium kick https://media0.giphy.com/media/2wOO6Zaq1zs3u/200.webp?cid=790b7611d0683cb0f6fa20d198ed88279e43bf58e85ae042&rid=200.webp
+ //low punch
+ Ken low light punch = http://wiki.shoryuken.com/images/3/39/%28kenclp%29.gif
+ Ken low medium punch = http://wiki.shoryuken.com/images/4/40/%28kenchp%29.gif
+ Ken low hard punch = http://wiki.shoryuken.com/images/6/6a/%28kensrk%29.gif
  
- ryu low hard kick = https://www.fightersgeneration.com/characters3/ryu-crouch-hk.gif
+ Ken punch high finisher = http://wiki.shoryuken.com/images/1/1c/%28kensrkex%29.gif
+ Ken punch low finisher = http://wiki.shoryuken.com/images/a/ad/%28kenhdkex%29.gif
  
+ //high kick
+ Ken high light kick = http://wiki.shoryuken.com/images/8/8f/%28kenfhk%29.gif
+ Ken high medium kick = http://wiki.shoryuken.com/images/d/d1/%28kenmk%29.gif
+ Ken high hard kick = http://wiki.shoryuken.com/images/2/25/%28kenhmk%29.gif
  
+ //low kick
+ Ken low light kick = http://wiki.shoryuken.com/images/2/22/%28kenlk%29.gif
+ Ken low medium kick = http://wiki.shoryuken.com/images/8/80/%28kencmk%29.gif
+ Ken low hard kick = http://wiki.shoryuken.com/images/5/53/%28kenchk%29.gif
  
+ Ken kick high finisher = http://wiki.shoryuken.com/images/a/a2/%28kenatskex%29.gif
+ Ken kick low finisher = http://wiki.shoryuken.com/images/d/d5/%28kensa3%29.gif
  */
