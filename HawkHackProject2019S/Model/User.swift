@@ -183,7 +183,7 @@ func saveUserLocally(user: User) {
 	print("Finished saving user \(user.name) locally...")
 }
 
-func increaseExperience(user: User, gained: Int, completion: @escaping () -> Void) {
+func increaseExperience(user: User, gained: Int, completion: @escaping () -> Void) { //method that increases user's experience. If they reach the maxExp needed to level up then bring the experience back to 0
     user.experience += gained
     let maxExp:Int = getMaxExperienceNeeded(fromLevel: user.level)
     print("Experience = \(user.experience)/\(maxExp)")
@@ -256,7 +256,7 @@ func userDictionaryFrom(user: User) -> NSDictionary { //take a user and return a
 }
 
 
-func updateCurrentUser(withValues: [String : Any], withBlock: @escaping(_ success: Bool) -> Void) { //OneSignal S3 ep. 24 withBlock makes it run in the background
+func updateCurrentUser(withValues: [String : Any], withBlock: @escaping(_ success: Bool) -> Void) { //OneSignal S3 ep. 24 withBlock makes it run in the background //method that saves our current user's values offline and online
 	
 	if UserDefaults.standard.object(forKey: kCURRENTUSER) != nil {
 		guard let currentUser = User.currentUser() else { return }
@@ -294,7 +294,7 @@ func getMaxExperienceNeeded(fromLevel level: Int) -> Int {
         return num
     case _ where level > 0:
         print("You are level \(level)")
-        num = (level * (level / 2)) * 100
+        num = ((level * (level / 2)) * 100) * (level / 2)
     default:
         break
     }

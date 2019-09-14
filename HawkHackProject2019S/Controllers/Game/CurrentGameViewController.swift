@@ -201,19 +201,19 @@ class CurrentGameViewController: UIViewController {
     }
     
 	
-	private func putAnimation(button: MovesButton, animation: (String,Int)) {
+	private func putAnimation(button: MovesButton, animation: (String,Int)) { //a method that takes a button and an animation. It will then assign the animation (with the right images and duration) to the button. Then it will animate those images appended to images array
 //		if button.cooldown > 1 { return }
-		var images: [UIImage] = []
+		var images: [UIImage] = [] //contains the images for the animation
 		var duration: Double = 0
-		button.animation = animation
-		if button.animation == ButtonAnimations.None {
+		button.animation = animation //assign the button's animation
+        if button.animation == ButtonAnimations.None {
 			duration = 0
 			button.damageMultiplier = 1
 		} else if button.animation == ButtonAnimations.SmallFire {
-			duration = 2.3
+			duration = 2.3 //because smallFire has 23 frames getting played every 0.1 secs
 			button.damageMultiplier *= 1.5
 			for i in 0 ... ButtonAnimations.SmallFire.1 {
-				images.append(UIImage(named: "\(ButtonAnimations.SmallFire.0)\(i)")!)
+				images.append(UIImage(named: "\(ButtonAnimations.SmallFire.0)\(i)")!) //
 			}
 		} else if button.animation == ButtonAnimations.BigFire {
 			duration = 1.5
@@ -223,7 +223,7 @@ class CurrentGameViewController: UIViewController {
 			}
 		} else { print("weird button animations") }
 		
-		switch button {
+		switch button { //which ever button is passed, animate it
 		case p1Button14LUp:
 			p1Button14ImageView.image = UIImage.animatedImage(with: images, duration: duration)
 		case p1Button15MUp:
@@ -257,7 +257,7 @@ class CurrentGameViewController: UIViewController {
 	
 	
 //MARK: Private methods -----------------------------------------------------
-	private func setupPlayersButtons() {
+	private func setupPlayersButtons() { //sets up the attributes of the buttons
 		player1MoveButtons = [p1Button10Up, p1Button11Back, p1Button12Down, p1Button13Forward]
 		player1AttackButtons = [p1Button14LUp, p1Button15MUp, p1Button16HUp, p1Button17LDown, p1Button18MDown, p1Button19HDown]
 		
@@ -313,27 +313,23 @@ class CurrentGameViewController: UIViewController {
 		p2Button29LDown.damage = 10
 	}
 	
-	private func startTurnTimer() {
+	private func startTurnTimer() { //A method that sets up the beginning of the round
 //        game?.roundNumber
 //        self.roundNumberLabel.text = "\(game?.roundNumber)"
         player1IsFirstImageView.isHidden = !p1HasSpeedBoost //if p1IsFirstImageView will be hidden if p1HasSpeedBoost == false
         player2IsFirstImageView.isHidden = p1HasSpeedBoost
         print("p1 is hidden  = \(!p1HasSpeedBoost)\np2 is hidden = \(p1HasSpeedBoost)")
         
-        if p1HasSpeedBoost {
-//            player1IsFirstImageView.isHidden = false
-//            player2IsFirstImageView.isHidden = true
+        if p1HasSpeedBoost { //gives a +1 speed boost to whichever player has the speed boost
             p1MoveResult = (damage:0, damageMultiplier:CGFloat(1), defenseMultiplier:CGFloat(1), speed: CGFloat(1)) //give p1MoveResults a +1 speed boost
             p2MoveResult = (damage:0, damageMultiplier:1, defenseMultiplier:1, speed:0)
         } else {
-//            player2IsFirstImageView.isHidden = false
-//            player1IsFirstImageView.isHidden = true
             p2MoveResult = (damage:0, damageMultiplier:CGFloat(1), defenseMultiplier:CGFloat(1), speed: CGFloat(1)) //give p2 +1 speed boost
             p1MoveResult = (damage:0, damageMultiplier:1, defenseMultiplier:1, speed:0)
         }
         
         
-		clockTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.updateTurnTime), userInfo: nil, repeats: true)
+		clockTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.updateTurnTime), userInfo: nil, repeats: true) //Once the round is ready, start the timer
 	}
 	
     
@@ -598,10 +594,6 @@ class CurrentGameViewController: UIViewController {
     
     
     private func gameOver() {
-
-//        player1HPLabel.text = game?.player1Id == game?.winnerUid ? "WIN!" : "LOSE"
-//        player2HPLabel.text = game?.player2Id == game?.winnerUid ? "WIN!": "LOSE"
-        
 //remove game reference here
         print("update and remove game reference here")
         
@@ -615,8 +607,15 @@ class CurrentGameViewController: UIViewController {
                 
             }
         }
+        game?.deleteGame(game: game!, completion: { (error) in
+            if let error = error {
+                Service.presentAlert(on: self, title: "Error Deleting Game", message: error)
+            } else {
+                print("Successfully deleted the ga e")
+            }
+        })
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
             self.performSegue(withIdentifier: "toGameOverSegue", sender: nil)
         }
     }

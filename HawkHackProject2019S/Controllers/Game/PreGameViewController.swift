@@ -51,26 +51,26 @@ class PreGameViewController: UIViewController {
 		disableButton(button: topButton)
 		
 		if isUserLoggedIn() {
-			incomingRequest()
+			observeUserGames()
 		}
 	}
 	
 	
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
-		
-		if User.currentUser() == nil {
-			helloLabel.text = "Please login or register in order to play a game"
-			disableButton(button: topButton)
-            disableButton(button: matchHistoryButton)
-		} else {
-            if isUserLoggedIn() {
-                incomingRequest()
-            }
-			helloLabel.text = "Hello \(User.currentUser()!.name). Enter the email you would like to play against and click the invite button."
-			enableButton(button: topButton)
+		self.navigationController?.isNavigationBarHidden = false
+        
+        if isUserLoggedIn() { //if we have a logged in user, get requests and reload tableView
+            helloLabel.text = "Hello \(User.currentUser()!.name). Enter the email you would like to play against and click the invite button."
+            enableButton(button: topButton)
             enableButton(button: matchHistoryButton)
-		}
+            
+//            observeUserGames()
+        } else {
+            helloLabel.text = "Please login or register in order to play a game"
+            disableButton(button: topButton)
+            disableButton(button: matchHistoryButton)
+        }
 	}
 	
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -82,23 +82,6 @@ class PreGameViewController: UIViewController {
             print(gameDictionaryFrom(game: game))
             gameVC.game = game
         
-//            //            print("game uid to segue is \(game.gameId)")
-////            let game2 = UserDefaults.standard.dictionary(forKey: game.gameId)
-//            if let gameDictionary = UserDefaults.standard.object(forKey: game.gameId) { //if game was saved before
-//                print("Game has been played before = \(gameDictionary)")
-//                let currentGame: Game = Game.init(_dictionary: gameDictionary as! [String : Any])
-//
-//                let gameVC: CurrentGameViewController = segue.destination as! CurrentGameViewController
-//                gameVC.game = currentGame
-//
-//            } else { //if game was never saved, start it
-//
-//                let gameVC: CurrentGameViewController = segue.destination as! CurrentGameViewController
-//                gameVC.game = game
-//
-//                UserDefaults.standard.set(game, forKey: game.gameId)
-//                UserDefaults.standard.synchronize()
-//            }
         default:
             break
         }
@@ -106,7 +89,7 @@ class PreGameViewController: UIViewController {
 	
 	
 	
-	//MARK: IBActions
+//MARK: IBActions
 	@IBAction func topButtonTapped(_ sender: Any) {
 		sendRequest()
 	}
@@ -131,7 +114,7 @@ class PreGameViewController: UIViewController {
 			if opponentUid == "" { return }
 			
 			fetchOpponentUserWith(opponentUid: opponentUid) { (opponentUser) in
-				guard let opponentUser = opponentUser else { return }
+                guard let opponentUser = opponentUser else { print("No users found"); return }
 				
 				DispatchQueue.main.async { //is needed or it will create 2 requests
 					let opponentDic = opponentUserToDictionaryFrom(user: opponentUser)
@@ -159,12 +142,8 @@ class PreGameViewController: UIViewController {
 		
         var gameValues: [String: AnyObject] = [kCREATEDAT: timeStamp, kUPDATEDAT: timeStamp, kGAMEID: gameId] as [String: AnyObject] //values for our game session on top of each users's infos
         
-		properties.forEach {gameValues[$0] = $1}
+		properties.forEach {gameValues[$0] = $1} //for each values in properties, append it to gameValues
         print("Game values is created. Recommended to also save this in Core Data \(gameValues)")
-        
-        
-        
-        
         
 		gameReference.updateChildValues(gameValues) { (error, ref) in //update our values in our reference
 			if let error = error {
@@ -186,15 +165,10 @@ class PreGameViewController: UIViewController {
 								Service.presentAlert(on: self, title: "Error", message: error.localizedDescription); return
 							} else {
 								print("Creating opponent user's game reference was successful")
-								
 							}
 						})
 					}
 				})
-                
-//                UserDefaults.standard.set(gameValues, forKey: gameId)
-//                UserDefaults.standard.synchronize()
-//                
 			}
 		}
 	}
@@ -202,22 +176,37 @@ class PreGameViewController: UIViewController {
 	
 	
 	
-	//MARK: Methods for incoming Requests
-	func incomingRequest() {
-		//		var properties: [String: AnyObject]?
-		let requestReference = firDatabase.child(kUSERTOGAMESESSIONS).child(User.currentId()) //MISSING OPPONENT'S UID before we can access the game session id
-		requestReference.observe(.value, with: { (snapshot) in
-			
+//MARK: Methods for observes incoming Requests
+	func observeUserGames() { //method that checks
+		let userToGameRef = firDatabase.child(kUSERTOGAMESESSIONS).child(User.currentId()) //MISSING OPPONENT'S UID before we can access the game session id
+//        userToGameRef.observe(.childAdded, with: { (snapshot) in //check child added
+//            let toUserId = snapshot.key
+//            print("Snapshot is \(snapshot) and snapshot key is \(snapshot.key)")
+//
+//            let toUserIdGameRef = userToGameRef.child(toUserId)
+//
+//            toUserIdGameRef.observe(.childAdded, with: { (snapshot) in
+////                let gameId = snapshot.key
+//                guard let gameIdDictionary = snapshot.value as? [String: AnyObject] else { print("No Game Id found"); return }
+//                self.gameUidsToGame(gameUidDictionary: gameIdDictionary)
+//            }, withCancel: nil)
+//
+////            guard let snapshot = snapshot.children.allObjects as? [DataSnapshot] else { print("No requests found"); return }
+////            for snap in snapshot { //each snap in snapshot is a dictionary //snap.key is the opponentUID and snap.value is the gameSessionId : 1
+////                guard let gameSessionUids = snap.value as? [String: AnyObject] else { print("snap.value cannot be found"); return } //snap.value = gameSessionId : 1 //has to be converted to [String: AnyObject] in order to get the snap.value properly
+////                self.gameUidsToGame(gameUidDictionary: gameSessionUids)
+////            }
+//        }, withCancel: nil)
+
+        
+        userToGameRef.observe(.value, with: { (snapshot) in
+
             guard let snapshot = snapshot.children.allObjects as? [DataSnapshot] else { print("No requests found"); return }
-//            guard let snapshot = snapshot.value as? NSDictionary else { print("no requests found"); return }
-//            print(snapshot)
-			for snap in snapshot { //each snap in snapshot is a dictionary //snap.key is the opponentUID and snap.value is the gameSessionId : 1
-				guard let gameSessionUids = snap.value as? [String: AnyObject] else { print("snap.value cannot be found"); return } //snap.value = gameSessionId : 1 //has to be converted to [String: AnyObject] in order to get the snap.value properly
-				self.gameUidsToGame(gameUidDictionary: gameSessionUids)
-				
-				
-			}
-		}, withCancel: nil)
+            for snap in snapshot { //each snap in snapshot is a dictionary //snap.key is the opponentUID and snap.value is the gameSessionId : 1
+                guard let gameSessionUids = snap.value as? [String: AnyObject] else { print("snap.value cannot be found"); return } //snap.value = gameSessionId : 1 //has to be converted to [String: AnyObject] in order to get the snap.value properly
+                self.gameUidsToGame(gameUidDictionary: gameSessionUids)
+            }
+        }, withCancel: nil)
 	}
 	
 	func gameUidsToGame(gameUidDictionary: [String: AnyObject]) {
@@ -239,50 +228,7 @@ class PreGameViewController: UIViewController {
 				}
 			})
 		}
-		
 	}
-	
-    /*
-     ryu introduction  = https://media.giphy.com/media/RPX59UHW0kTOE/giphy.gif
-     ryu crouch =
-     https://media.giphy.com/media/mDY5oRfRKxhu/giphy.gif
-     
-     ryu jump = http://wiki.shoryuken.com/images/e/e1/%28ryujump%29.gif
-     
-//high punch
-     ryu high light punch = https://media1.giphy.com/media/thfWGJWuxPXqg/200.webp?cid=790b7611d0683cb0f6fa20d198ed88279e43bf58e85ae042&rid=200.webp
-     
-     ryu high medium punch = https://media2.giphy.com/media/H5hqxjK6eGeFa/200.webp?cid=790b7611cdc459e41aa1be4ee6f75ce2dee335ee56fb1946&rid=200.webp
-     ryu high hard punch =
-     https://media.giphy.com/media/zGLwWJPJzhWV2/giphy.gif
-     
-     
-//low punch
-     ryu low medium punch = http://people.cs.vt.edu/fiqbal/handlebar/reference-sprites/ryu-punch-02.gif
-     ryu low medium punch = https://media3.giphy.com/media/HD4BNrroZa3Oo/200w.webp?cid=790b76117f9f8bb78cf3522ae616598253e319b03b6d5780&rid=200w.webp
-     
-     ryu low hard punch = http://wiki.shoryuken.com/images/e/ee/Ryu_f.mp.gif
-     
-     
-//high kick
-     ryu high light kick = https://media.giphy.com/media/ShFXWoVRzzkVG/giphy.gif
-     
-     ryu high medium kick = https://media.giphy.com/media/UZ66rWaC2BXP2/200.gif
-     
-     ryu high hard kick = https://media0.giphy.com/media/jA8QFjEjjaHyo/200.webp?cid=790b7611d0683cb0f6fa20d198ed88279e43bf58e85ae042&rid=200.webp
-     
-//low kick
-     ryu low light kick =
-     https://vignette.wikia.nocookie.net/streetfighter/images/4/49/RyuLK.gif/revision/latest?cb=20140308155001
-     
-     
-     ryu low medium kick https://media0.giphy.com/media/2wOO6Zaq1zs3u/200.webp?cid=790b7611d0683cb0f6fa20d198ed88279e43bf58e85ae042&rid=200.webp
-     
-     ryu low hard kick = https://www.fightersgeneration.com/characters3/ryu-crouch-hk.gif
-     
-     
-     
-     */
     
 	
 //MARK: Helper private methods
@@ -330,12 +276,7 @@ class PreGameViewController: UIViewController {
 		button.alpha = 1
 		button.isEnabled = true
 	}
-	
-	
-	
-	
-	
-	
+
 }
 
 
@@ -393,3 +334,52 @@ extension PreGameViewController: MatchesTableViewCellDelegate {
 		}
 	}
 }
+
+
+
+
+
+
+
+
+/* //Animation REFERENCES
+ ryu introduction  = https://media.giphy.com/media/RPX59UHW0kTOE/giphy.gif
+ ryu crouch =
+ https://media.giphy.com/media/mDY5oRfRKxhu/giphy.gif
+ 
+ ryu jump = http://wiki.shoryuken.com/images/e/e1/%28ryujump%29.gif
+ 
+ //high punch
+ ryu high light punch = https://media1.giphy.com/media/thfWGJWuxPXqg/200.webp?cid=790b7611d0683cb0f6fa20d198ed88279e43bf58e85ae042&rid=200.webp
+ 
+ ryu high medium punch = https://media2.giphy.com/media/H5hqxjK6eGeFa/200.webp?cid=790b7611cdc459e41aa1be4ee6f75ce2dee335ee56fb1946&rid=200.webp
+ ryu high hard punch =
+ https://media.giphy.com/media/zGLwWJPJzhWV2/giphy.gif
+ 
+ 
+ //low punch
+ ryu low medium punch = http://people.cs.vt.edu/fiqbal/handlebar/reference-sprites/ryu-punch-02.gif
+ ryu low medium punch = https://media3.giphy.com/media/HD4BNrroZa3Oo/200w.webp?cid=790b76117f9f8bb78cf3522ae616598253e319b03b6d5780&rid=200w.webp
+ 
+ ryu low hard punch = http://wiki.shoryuken.com/images/e/ee/Ryu_f.mp.gif
+ 
+ 
+ //high kick
+ ryu high light kick = https://media.giphy.com/media/ShFXWoVRzzkVG/giphy.gif
+ 
+ ryu high medium kick = https://media.giphy.com/media/UZ66rWaC2BXP2/200.gif
+ 
+ ryu high hard kick = https://media0.giphy.com/media/jA8QFjEjjaHyo/200.webp?cid=790b7611d0683cb0f6fa20d198ed88279e43bf58e85ae042&rid=200.webp
+ 
+ //low kick
+ ryu low light kick =
+ https://vignette.wikia.nocookie.net/streetfighter/images/4/49/RyuLK.gif/revision/latest?cb=20140308155001
+ 
+ 
+ ryu low medium kick https://media0.giphy.com/media/2wOO6Zaq1zs3u/200.webp?cid=790b7611d0683cb0f6fa20d198ed88279e43bf58e85ae042&rid=200.webp
+ 
+ ryu low hard kick = https://www.fightersgeneration.com/characters3/ryu-crouch-hk.gif
+ 
+ 
+ 
+ */

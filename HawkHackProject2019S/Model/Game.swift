@@ -84,22 +84,24 @@ class Game {
 //        return nil //if we dont have user in our UserDefaults, then return nil
 //    }
 	
-	internal func gamePartnerId() -> String {
+	internal func gamePartnerId() -> String { //a method that returns current user's opponentId
 		return (player1Id == User.currentId() ? player2Id : player1Id)!
 	}
 	
-    func addGameToHistory(game: Game, completion: @escaping (_ value: String?)-> Void) {
+    func addGameToHistory(resultValues: [String: Any], completion: @escaping (_ value: String?)-> Void) {
     //lastly, add it to GameHistory
-        let userGameHistoryRef = firDatabase.child(kGAMEHISTORY).child(User.currentId()).child(game.gameId)
-        userGameHistoryRef.setValue(gameDictionaryFrom(game: game)) { (error, ref) in
+        let userGameHistoryRef = firDatabase.child(kGAMEHISTORY).child(User.currentId()).child(gameId)
+        userGameHistoryRef.setValue(resultValues) { (error, ref) in
             if let error = error {
                 completion(error.localizedDescription)
             } else {
+                UserDefaults.standard.set(resultValues, forKey: self.gameId)
+                UserDefaults.standard.synchronize()
+                
                 print("succesfully saved the game in kGAMEHISTORY")
                 completion(nil)
             }
         }
-        
     }
     
 	func deleteGame(game: Game, completion: @escaping (_ value: String?)-> Void) {
@@ -157,96 +159,60 @@ class Game {
 	}
     
     
-                        //------UPLOAD GAME RESULT------
+//------SAVE GAME RESULT------
     func saveGameResult(game: Game, completion: @escaping (_ error: String?)-> Void) {
-        print("uploadGameResult is now being ran")
-        
-//        UserDefaults.standard.set(gameDictionaryFrom(game: game), forKey: game.gameId)
-//        UserDefaults.standard.synchronize()
-        
-        //MARK: These next26 lines basically upload current user's result of the game
+    //MARK: These next26 lines basically upload current user's result of the game
         let user: User = User.currentUser()!
-        
-//        print("\n\n\nUser dictionary of the user uploading gamae result = \(userDictionaryFrom(user: user))")
-        
         let userUid = user.userID
-    
-        
-        
-        
-        
-        let userRef = firDatabase.child(kUSERS).child(userUid).child(kGAMESTATS)//NOW WORK ON PULLING WINNER/LOSER, EXPERIENCE, AND LEVEL
+        let userRef = firDatabase.child(kUSERS).child(userUid).child(kGAMESTATS) //this reference has the user's win, loses, experience and level
         print("save the game result from here")
         
 //save in User Entity
-        userRef.observeSingleEvent(of: .value, with: { (snap) in
-            if let userDic = snap.value as? NSDictionary {
-                //                print("User dic in uploadGameResult = \(userDic)")
+        userRef.observeSingleEvent(of: .value, with: { (snap) in //this method grabs the user's game stats and update it depending if they win or not
+            var expGained: Int?
+            
+            if let userDic = snap.value as? NSDictionary { //if we have a snapshot.value, then increase game stats and update the user
                 let wins = userDic[kWINS] as? Int ?? 0
                 let loses = userDic[kLOSES] as? Int ?? 0
-//                let experience = userDic[kEXPERIENCES] as? Int ?? 0
                 
-            //update user
                 user.wins = userUid == game.winnerUid ? wins + 1 : wins + 0
                 user.loses = userUid == game.winnerUid ? loses + 0 : loses + 1
-                let expGained = userUid == game.winnerUid ? 100 : 10
-                
-                increaseExperience(user: user, gained: expGained, completion: {
-                    let statsValues: [String: Int] = [kWINS: user.wins!, kLOSES: user.loses!, kEXPERIENCES: user.experience, kLEVEL: user.level]
-                    
-                    updateCurrentUser(withValues: statsValues, withBlock: { (hasError) in //updateCurrent User first with statsValues then update the userRef
-                        if !hasError {//if has error == false
-                            completion("Error updating current user")
-                        } else {
-                            print("No error updating current user's statsValue")
-                        }
-                    })
-                    
-                    userRef.updateChildValues(statsValues, withCompletionBlock: { (error, ref) in //n in //LOOKING FOR KEXPERIENCE
-                        if let error = error {
-                            completion(error.localizedDescription)
-                        } else {
-                            print("Successfully updated wins stats and experience in firebase")
-                        }
-                    })
-                })
-                
-            } else { //if there is no snap.value
-                
+                expGained = userUid == game.winnerUid ? 100 : 10
+            } else { //if there is no snap.value, meaning it's the USER'S FIRST TIME PLAYING
                 user.wins = userUid == game.winnerUid ? 1 : 0
                 user.loses = userUid == game.winnerUid ? 0 : 1
-                let expGained = userUid == game.winnerUid ? 100 : 10
-                increaseExperience(user: user, gained: expGained, completion: {
-                    let statsValues: [String: Int] = [kWINS: user.wins!, kLOSES: user.loses!, kEXPERIENCES: user.experience, kLEVEL: user.level] //if currentUser won, then increase win by 1 and exp by 100 || lose by 1 and exp by 10
-                    
-                    updateCurrentUser(withValues: statsValues, withBlock: { (hasError) in //updateCurrent User first with statsValues then update the userRef
-                        if !hasError {//if has error == false
-                            completion("Error updating current user")
-                        } else {
-                            print("No error updating current user's statsValue")
-                        }
-                    })
-                    
-                    userRef.updateChildValues(statsValues, withCompletionBlock: { (error, ref) in //LOOKING FOR KEXPERIENCE
-                        if let error = error {
-                            completion(error.localizedDescription)
-                        } else {
-                            print("Successfully updated wins stats and experience in firebase")
-                        }
-                    })
-                })
+                expGained = userUid == game.winnerUid ? 100 : 10
             }
+            
+            increaseExperience(user: user, gained: expGained!, completion: {
+                
+                let statsValues: [String: Int] = [kWINS: user.wins!, kLOSES: user.loses!, kEXPERIENCES: user.experience, kLEVEL: user.level] //if currentUser won, then increase win by 1 and exp by 100 || lose by 1 and exp by 10
+                
+                updateCurrentUser(withValues: statsValues, withBlock: { (hasError) in //updateCurrent User first with statsValues then update the userRef
+                    if !hasError {//if has error == false
+                        completion("Error updating current user")
+                    } else {
+                        print("No error updating current user's statsValue")
+                    }
+                })
+                
+                userRef.updateChildValues(statsValues, withCompletionBlock: { (error, ref) in //LOOKING FOR KEXPERIENCE
+                    if let error = error {
+                        completion(error.localizedDescription)
+                    } else {
+                        print("Successfully updated wins stats and experience in firebase")
+                    }
+                })
+            })
+            
         })
         
         
-        
 //save in GameHistory Entity
-//        let opponentUid: String = (game.player1Id == userUid ? game.player2Id : game.player1Id)!
         var opponentUid: String = ""
         var opponentName: String = ""
         var opponentAvatarUrl: String = ""
         var hpLeft = 0
-        
         
         if game.player1Id != userUid { //if current user is not player 1, then theyre p2
             opponentUid = (game.player1Id)!
@@ -260,135 +226,15 @@ class Game {
             hpLeft = (game.player1HP)
         }
         
-        
-//DISABLED FOR NOW
-        let gameHistoryRef = firDatabase.child(kGAMEHISTORY).child(userUid).child(game.gameId)
+//Add game to history
         let resultValues: [String: Any] = userUid == game.winnerUid ? [kRESULT: "W", kOPPONENTUID: opponentUid, kOPPONENTNAME: opponentName, kOPPONENTAVATARTURL: opponentAvatarUrl, kHPLEFT: hpLeft] : [kRESULT: "L", kOPPONENTUID: opponentUid, kOPPONENTNAME: opponentName, kOPPONENTAVATARTURL: opponentAvatarUrl, kHPLEFT: hpLeft, kGAMEID: game.gameId]
-        
-        var gameValues = gameDictionaryFrom(game: game) as! Dictionary<String, Any>
-        resultValues.forEach {gameValues[$0] = $1}
-        
-        print("Result is \(resultValues)")
-    //save it offline
-        UserDefaults.standard.set(resultValues, forKey: game.gameId) //values needs lesser key-value pairs to store
-        UserDefaults.standard.synchronize()
-        
-    //save it online - setting the value in the reference
-//        gameHistoryRef.setValue(resultValues) { (error, ref) in //update game history reference
-//            if let error = error {
-//                completion(error.localizedDescription)
-//            } else {
-//                print("Finished saving the game in Game History")
-//                //                completion(nil)
-//            }
-//        }
-        
-        
-        print("No error at all!!!")
+        addGameToHistory(resultValues: resultValues) { (error) in
+            if let error = error {
+                completion(error)
+            }
+        }
         completion(nil)
-        //
-        //    if userUid == game.winnerUid { //if currentUser won... //work on values being set, and maybe return User upon completion()
-        //        //set the result in gameHistory
-        //        gameHistoryRef.setValue([kRESULT: "W", kOPPONENTUID: opponentUid]) { (error, ref) in
-        //            if let error = error {
-        //                completion(error.localizedDescription)
-        //            } else {
-        //                print("Finished saving the win")
-        ////                completion(nil)
-        //            }
-        //        }
-        //
-        //
-        ////grab the user's win, exp, level and update it
-        //        userRef.observeSingleEvent(of: .value, with: { (snap) in
-        //
-        ////            if snap.exists() {
-        ////            print("\n\ngame result Snap is \(snap)\n\n")
-        ////                guard let userDic = snap.value as? NSDictionary else { print("No userDic found")
-        //
-        //            if let userDic = snap.value as? NSDictionary {
-        ////                print("User dic in uploadGameResult = \(userDic)")
-        //                let wins = userDic[kWINS] as? Int ?? 0
-        //                let experience = userDic[kEXPERIENCES] as? Int ?? 0
-        //
-        //                userRef.updateChildValues([kWINS: wins + 1, kEXPERIENCES: experience + 100], withCompletionBlock: { (error, ref) in //LOOKING FOR KEXPERIENCE
-        //                    if let error = error {
-        //                        completion(error.localizedDescription)
-        //                    } else {
-        //                        print("Successfully updated wins stats and experience in firebase")
-        //                    }
-        //                })
-        //            } else {
-        //                userRef.setValue([kWINS: 1, kEXPERIENCES: 100], withCompletionBlock: { (error, ref) in
-        //                    print("This is first game ever, should only be printed once")
-        //
-        //                    if let error = error {
-        //                        completion(error.localizedDescription)
-        //
-        //                    } else {
-        //                        print("First game completed with a win!")
-        //
-        //                    }
-        //                })
-        //            }
-        //        }, withCancel: nil)
-        //
-        //    } else { //if userUid != game.winnerUid, meaning currentUser lose
-        //        print("current user lost")
-        //        gameHistoryRef.setValue(["result": "loser", "opponentUid": opponentUid]) { (error, ref) in
-        //            if let error = error {
-        //                completion(error.localizedDescription)
-        //            } else {
-        //                print("Finished saving the lose)")
-        //                ////                completion(nil)
-        //                //            }
-        //                //        }
-        //                //
-        //            } //end of no error on setting value on gameHistory
-        //        } //end of gameHistory.setValue
-        //
-        //        //        //grab the user's lose, exp, level and update it
-        //        userRef.observeSingleEvent(of: .value, with: { (snap) in
-        //            //            if snap.exists() {
-        //            //                guard let userDic = snap.value as? NSDictionary else { print("No userDic found"); return }
-        //            if let userDic = snap.value as? NSDictionary {
-        //                let loses = userDic[kLOSES] as? Int ?? 0
-        //                let experience = userDic[kEXPERIENCES] as? Int ?? 0
-        //
-        //                userRef.updateChildValues([kLOSES: loses + 1, kEXPERIENCES: experience + 10], withCompletionBlock: { (error, ref) in
-        //                    if let error = error {
-        //                        completion(error.localizedDescription)
-        //                    } else {
-        //                        print("Successfully updated lose stats and experience in firebase")
-        //                    }
-        //                })
-        //
-        //            } else {
-        //                userRef.setValue([kLOSES: 1, kEXPERIENCES: 10], withCompletionBlock: { (error, ref) in
-        //                    print("This is first game ever, should only be printed once")
-        //
-        //                    if let error = error {
-        //                        completion(error.localizedDescription)
-        ////                        return
-        //                    } else {
-        //                        print("First game completed with a LOSE!")
-        //
-        //                    }
-        //                })
-        //            } //end of user's 1st fighting game ever
-        //        }, withCancel: nil) //end of userRef.observeSingleEvent
-        //
-        //    } //end of if currentUser lose
-        //
     }
-
-//--------------------------------------+++++++++++++++++++++++++++++++++++
-    
-//    class func currentGameRoundNumber(game: Game) {
-//        let ref = firDatabase.child(kGAMESESSIONS).child(game.gameId).child(kTURNCOUNT)
-//        ref.observeSingleValue
-//    }
-    
 }
 
 //+++++++++++++++++++++++++   MARK: Saving user   ++++++++++++++++++++++++++++++++++

@@ -110,6 +110,16 @@ class GameOverViewController: UIViewController {
         gainedExpShapeLayer.add(basicAnimation, forKey: "basicAnimation")
     }
     
+// pop back n viewcontroller
+    func popBack(_ nb: Int) { //method that pops View controller to a certain amount nb
+        if let viewControllers: [UIViewController] = self.navigationController?.viewControllers {
+            guard viewControllers.count < nb else {
+                self.navigationController?.popToViewController(viewControllers[viewControllers.count - nb], animated: true)
+                return
+            }
+        }
+    }
+    
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -122,24 +132,11 @@ class GameOverViewController: UIViewController {
     }
     
     @IBAction func noButtonTapped(_ sender: Any) {
-        let preGameVC: PreGameViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: kPREGAMEVIEWCONTROLLER) as! PreGameViewController
-//        self.navigationController?.popToViewController(preGameVC, animated: true)
-        game?.deleteGame(game: game!, completion: { (error) in
-            if let error = error {
-                Service.presentAlert(on: self, title: "Error Deleting", message: error)
-            } else {
-                
-//                self.navigationController?.popToViewController(preGameVC, animated: true)
-            }
-        })
+//        let preGameVC: PreGameViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: kPREGAMEVIEWCONTROLLER) as! PreGameViewController
+////        self.navigationController?.popToViewController(preGameVC, animated: true)
+//        self.navigationController?.popToRootViewController(animated: true)
         
-        game?.addGameToHistory(game: game!, completion: { (error) in
-            if let error = error {
-                Service.presentAlert(on: self, title: "Error Adding to History", message: error)
-            } else {
-                self.navigationController?.popToRootViewController(animated: true)
-            }
-        })
+        popBack(3) //pop back 2 view controllers, meaning to PreGameViewController
     }
     
     @IBAction func yesButtonTapped(_ sender: Any) {
