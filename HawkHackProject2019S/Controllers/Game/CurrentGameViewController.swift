@@ -9,10 +9,61 @@
 import UIKit
 
 struct RyuAnimationName {
-	static let Standing = ("ryu", 6) //because frames only goes from 0-5
-	static let Jump = ("ryuJumpPunch", 32)
-	static let Kick = ("", 0)
-	static let Punch = ("ryuJumpPunch", 32)
+    static let Intro = ("ryuIntro", 19) //last frame is 18 and +1 = 19
+    static let Standing = ("ryu", 6) //because frames only goes from 0-5
+    static let Jump = ("ryuJump", 34) //needs to be sped up
+    
+    static let RyuPunchHighLight = ("ryuPunchHL", 6) //high light
+    static let RyuPunchHighMedium = ("ryuPunchHM", 8) //high medium
+    static let RyuPunchHighHard = ("ryuPunchHH", 13) //high hard
+    static let RyuPunchLowLight = ("ryuPunchLL", 7) //low light
+    static let RyuPunchLowMedium = ("ryuPunchLM", 11) //low medium
+    static let RyuPunchLowHard = ("ryuPunchLH", 11) //low hard
+    
+    static let RyuPunchHighFinisher = ("ryuPunchHighFinisher", 25) //high finisher
+    static let RyuPunchLowFinisher = ("ryuPunchLowFinisher", 47) //low finisher
+    
+    static let RyuKickHighLight = ("ryuKickHL", 11) //high light
+    static let RyuKickHighMedium = ("ryuKickHM", 15)
+    static let RyuKickHighHard = ("ryuKickHH", 27)
+    static let RyuKickLowLight = ("ryuKickLL", 7) //low light
+    static let RyuKickLowMedium = ("ryuKickLM", 11)
+    static let RyuKickLowHard = ("ryuKickLH", 13)
+    
+    static let RyuKickHighFinisher = ("ryuKickHighFinisher", 53) //high finisher
+    static let RyuKickLowFinisher = ("ryuKickLowFinisher", 39)//low finisher
+    
+    //    static let Jump = ("ryuJumpPunch", 32)
+    //    static let Punch = ("ryuJumpPunch", 32)
+}
+
+struct KenAnimationName {
+    static let KenIntro = ("kenIntro", 8) //last frame is 18 and +1 = 19
+    static let KenStanding = ("kenStanding", 10)
+    static let KenJump = ("kenJump", 34)
+    
+    static let KenPunchHighLight = ("kenPunchHL", 5) //high light
+    static let KenPunchHighMedium = ("kenPunchHM", 9)
+    static let KenPunchHighHard = ("kenPunchHH", 12)
+    static let KenPunchLowLight = ("kenPunchLL", 6) //low light
+    static let KenPunchLowMedium = ("kenPunchLM", 11)
+    static let KenPunchLowHard = ("kenPunchLH", 27)
+    
+    static let KenPunchHighFinisher = ("kenPunchHighFinisher", 58) //high finisher
+    static let KenPunchLowFinisher = ("kenPunchLowFinisher", 51) //low finisher
+    
+//    static let KenKickHighLight = ("", ) //high light
+//    static let KenKickHighMedium = ("", )
+//    static let KenKickHighHard = ("", )
+//    static let KenKickLowLight = ("", ) //low light
+//    static let KenKickLowMedium = ("", )
+//    static let KenKickLowHard = ("", )
+    
+    static let KenKickHighFinisher = ("kenKickHighFinisher", 51) //high finisher
+//    static let KenKickLowFinisher = ("kenKickLowFinisher", ) //low finisher
+    
+    //    static let Jump = ("ryuJumpPunch", 32)
+    //    static let Punch = ("ryuJumpPunch", 32)
 }
 
 struct ButtonAnimations {
