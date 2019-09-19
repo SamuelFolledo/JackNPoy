@@ -527,23 +527,41 @@ class CurrentGameViewController: UIViewController {
         
         ryuCounter = 0
         
-        updateCurrentGame(game: game!, withValues: ["round\(game!.roundNumber)": [player1TagSelected.move, player1TagSelected.attack, player2TagSelected.move, player2TagSelected.attack]]) { (error) in //update this sht
-            if let error = error {
-                Service.presentAlert(on: self, title: "Updating Round Error", message: error)
-                return
-            } else {
-                print("No error updating the game's dictionary = \(gameDictionaryFrom(game: self.game!))")
-            }
-        }
         
+        
+        //get p1 and p2 damage
         var player1Damage = Int(CGFloat(p1MoveResult.damage!) * p1MoveResult.damageMultiplier! * p2MoveResult.defenseMultiplier!)
         var player2Damage = Int(CGFloat(p2MoveResult.damage!) * p2MoveResult.damageMultiplier! * p1MoveResult.defenseMultiplier!)
         
+    
         if p1MoveResult.speed! > p2MoveResult.speed! { //if p1 is first then lower p2's damage
-            player2Damage = Int(CGFloat(player1Damage) * 0.9)
+            switch player1TagSelected.attack {
+            case 14, 17:
+                player2Damage = Int(CGFloat(player2Damage) * 0.9) //if light attacks were used, reduce opponent's damage by 10%
+            case 15, 18:
+                player2Damage = Int(CGFloat(player2Damage) * 0.8) //if light attacks were used, reduce opponent's damage by 10%
+            case 16, 19:
+                player2Damage = Int(CGFloat(player2Damage) * 0.7) //if light attacks were used, reduce opponent's damage by 10%
+            case .none, 1: //if user picked nothing then dont reduce damage
+                print("p1 user didn't select an attack")
+            default:
+                print("Weird p1 tag")
+            }
         }
-        if p2MoveResult.speed! > p1MoveResult.speed! {
-            player1Damage = Int(CGFloat(player1Damage) * 0.9)
+        
+        if p2MoveResult.speed! > p1MoveResult.speed! { //if p2 is first then reduce p1's damage
+            switch player2TagSelected.attack {
+            case 24, 27:
+                player1Damage = Int(CGFloat(player1Damage) * 0.9) //if light attacks were used, reduce opponent's damage by 10%
+            case 25, 28:
+                player1Damage = Int(CGFloat(player1Damage) * 0.8) //if light attacks were used, reduce opponent's damage by 10%
+            case 26, 29:
+                player1Damage = Int(CGFloat(player1Damage) * 0.7) //if light attacks were used, reduce opponent's damage by 10%
+            case .none, 1: //if user picked nothing then dont reduce damage
+                print("p2 user didn't select an attack")
+            default:
+                print("Weird p2 tag")
+            }
         }
         
         //            print("P1 Damage = \(player1Damage)\nP2 Damage = \(player2Damage)")
@@ -551,7 +569,7 @@ class CurrentGameViewController: UIViewController {
         //        print("P1 \(p1MoveResult)\nP2 \(p2MoveResult)")
         
         
-        if player1Damage > 0 {
+        if player1Damage > 0 { //displays the damage if p1's damage is greater than 0
             player2DamageLabel.text = "-\(player1Damage)"
             player2DamageLabel.isHidden = false
             player2DamageLabel.pulsate()
@@ -623,48 +641,65 @@ class CurrentGameViewController: UIViewController {
         }
         
         
-        let userHP: [String: Int] = User.currentId() == game?.player1Id ? ["player1Hp": game!.player1HP] : ["player2Hp":game!.player2HP]
         
-        updateCurrentGame(game: game!, withValues: userHP) { (error) in
-            if let error = error {
-                Service.presentAlert(on: self, title: "Error Updating Current Game", message: error)
-                return
-            } else {
-                print("Players HP updated successfully")
+        if isAgainstOnlineUser { //if we are against an online user then save locally
+            updateCurrentGame(game: game!, withValues: ["round\(game!.roundNumber)": [player1TagSelected.move, player1TagSelected.attack, player2TagSelected.move, player2TagSelected.attack, game!.player1HP, game!.player2HP]]) { (error) in //update the game in background in Firebase
+                if let error = error {
+                    Service.presentAlert(on: self, title: "Updating Round Error", message: error)
+                    return
+                }
             }
         }
         
         completion()
-        
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: { //delay
-////            self.player1DamageLabel.isHidden = true
-////            self.player2DamageLabel.isHidden = true
-//            completion() //not gameOVer cuz p1/p2 is still alive
-//        })
     }
     
     
     private func gameOver() {
 //remove game reference here
         print("update and remove game reference here")
-        
-        game!.saveGameResult(game: game!) { (error) in
-            if let error = error {
-                Service.presentAlert(on: self, title: "Upload Error", message: error)
-                return
-            } else {
-                print("\nFinished uploading result\nNow let's save it locally and to our User object\n\nDo not forget to also save the game and the user here\n\n")
-//                User.currentUser().
+        let currentUser = User.currentUser()!
+        if !isAgainstOnlineUser { //if we are not against another user, update user and delete reference to the game
+            increaseExperience(user: currentUser, gained: 1, completion: { //increase user's experience by 1
+                let statsValues: [String: Int] = [kEXPERIENCES: currentUser.experience, kLEVEL: currentUser.level] //if currentUser won, then increase win by 1 and exp by 100 || lose by 1 and exp by 10
                 
+                updateCurrentUser(withValues: statsValues, withBlock: { (hasError) in //updateCurrent User first with statsValues then update the userRef
+                    if !hasError {
+                        Service.presentAlert(on: self, title: "Error", message: "Error updating user")
+                    }
+                })
+            })
+            game?.deleteGame(game: game!, completion: { (error) in //delete the game
+                if let error = error  {
+                    Service.presentAlert(on: self, title: "Error", message: error)
+                }
+            })
+            
+        } else { //if we are playing online then we update the user, add game to GameHistory and delete the game
+            game!.saveUserFromGameResult(game: game!) { (error) in
+                if let error = error {
+                    Service.presentAlert(on: self, title: "Upload Error", message: error)
+                    return
+                } else {
+                    
+                    self.game!.addGameToHistory() { (error) in
+                        if let error = error {
+                            Service.presentAlert(on: self, title: "Error", message: error)
+                        } else {
+                        
+                            print("\nFinished uploading result\nNow let's save it locally and to our User object\n\nDo not forget to also save the game and the user here\n\n")
+                            self.game!.deleteGame(game: self.game!, completion: { (error) in
+                                if let error = error {
+                                    Service.presentAlert(on: self, title: "Error Deleting Game", message: error)
+                                } else {
+                                    print("Successfully deleted the game")
+                                }
+                            })
+                        }
+                    }
+                }
             }
         }
-        game?.deleteGame(game: game!, completion: { (error) in
-            if let error = error {
-                Service.presentAlert(on: self, title: "Error Deleting Game", message: error)
-            } else {
-                print("Successfully deleted the ga e")
-            }
-        })
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
             self.performSegue(withIdentifier: "toGameOverSegue", sender: nil)
@@ -793,7 +828,7 @@ class CurrentGameViewController: UIViewController {
 			p1MoveResult.speed! /= 2
 			p1MoveResult.defenseMultiplier! *= 0.75
 			
-		case 13: //if p1 moved forward
+		case 13: //if p1 moved forward, double the attack's speed and slightly increase damage
 			p1MoveResult.speed! *= 2
 			p1MoveResult.damageMultiplier! *= 1.25
 			

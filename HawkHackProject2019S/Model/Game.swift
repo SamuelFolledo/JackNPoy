@@ -11,7 +11,6 @@ import FirebaseAuth
 
 class Game {
 	
-	
 	var player1Id: String?
 	var text: String?
 	var player2Id: String?
@@ -43,6 +42,13 @@ class Game {
 	static let sharedInstance = Game() //initialize this Game as singleton
 	private init() {} //PB ep75 2mins this prevents reinitialization. This prevents us to invoke the ShoppingCart.init(), the access of this class is only through sharedInstance
 	
+//    init(_historyDictionary: [String: Any]) {
+////        [kRESULT: "W", kOPPONENTUID: opponentUid, kOPPONENTNAME: opponentName, kOPPONENTAVATARTURL: opponentAvatarUrl, kHPLEFT: hpLeft, kGAMEID: self.game!.gameId]
+//        self.gameId = _historyDictionary[kGAMEID] as! String
+//        self.createdAt =
+//
+//    }
+    
 	init(_dictionary: [String: Any]) { //constructor
 		self.player1Id = _dictionary[kPLAYER1ID] as? String
 		self.text = _dictionary["text"] as? String
@@ -88,17 +94,16 @@ class Game {
 		return (player1Id == User.currentId() ? player2Id : player1Id)!
 	}
 	
-    func addGameToHistory(resultValues: [String: Any], completion: @escaping (_ value: String?)-> Void) {
+    func addGameToHistory(completion: @escaping (_ value: String?)-> Void) {
     //lastly, add it to GameHistory
         let userGameHistoryRef = firDatabase.child(kGAMEHISTORY).child(User.currentId()).child(gameId)
-        userGameHistoryRef.setValue(resultValues) { (error, ref) in
+        userGameHistoryRef.setValue(gameDictionaryFrom(game: self)) { (error, ref) in
             if let error = error {
                 completion(error.localizedDescription)
             } else {
-                UserDefaults.standard.set(resultValues, forKey: self.gameId)
+                UserDefaults.standard.set(gameDictionaryFrom(game: self), forKey: self.gameId)
                 UserDefaults.standard.synchronize()
                 
-                print("succesfully saved the game in kGAMEHISTORY")
                 completion(nil)
             }
         }
@@ -111,7 +116,6 @@ class Game {
 				completion(error.localizedDescription)
 			} else {
 				print("Successfully removed \(game.gameId) from P1")
-//				completion("Success")
 			}
 		}
 		
@@ -160,7 +164,7 @@ class Game {
     
     
 //------SAVE GAME RESULT------
-    func saveGameResult(game: Game, completion: @escaping (_ error: String?)-> Void) {
+    func saveUserFromGameResult(game: Game, completion: @escaping (_ error: String?)-> Void) {
     //MARK: These next26 lines basically upload current user's result of the game
         let user: User = User.currentUser()!
         let userUid = user.userID
@@ -204,35 +208,8 @@ class Game {
                     }
                 })
             })
-            
         })
         
-        
-//save in GameHistory Entity
-        var opponentUid: String = ""
-        var opponentName: String = ""
-        var opponentAvatarUrl: String = ""
-        var hpLeft = 0
-        
-        if game.player1Id != userUid { //if current user is not player 1, then theyre p2
-            opponentUid = (game.player1Id)!
-            opponentName = (game.player1Name)!
-            opponentAvatarUrl = (game.player1AvatarUrl)!
-            hpLeft = (game.player2HP)
-        } else {
-            opponentUid = (game.player2Id)!
-            opponentName = (game.player2Name)!
-            opponentAvatarUrl = (game.player2AvatarUrl)!
-            hpLeft = (game.player1HP)
-        }
-        
-//Add game to history
-        let resultValues: [String: Any] = userUid == game.winnerUid ? [kRESULT: "W", kOPPONENTUID: opponentUid, kOPPONENTNAME: opponentName, kOPPONENTAVATARTURL: opponentAvatarUrl, kHPLEFT: hpLeft] : [kRESULT: "L", kOPPONENTUID: opponentUid, kOPPONENTNAME: opponentName, kOPPONENTAVATARTURL: opponentAvatarUrl, kHPLEFT: hpLeft, kGAMEID: game.gameId]
-        addGameToHistory(resultValues: resultValues) { (error) in
-            if let error = error {
-                completion(error)
-            }
-        }
         completion(nil)
     }
 }
@@ -336,7 +313,7 @@ class Game {
 //}
 
 //---------------------------------++++++++++++++++++++++++++++++++++++++++++++++++
-func updateCurrentGame(game: Game, withValues: [String : Any], withBlock: @escaping(_ error: String?) -> Void) { //OneSignal S3 ep. 24 withBlock makes it run in the background
+func updateCurrentGame(game: Game, withValues: [String : Any], withBlock: @escaping(_ error: String?) -> Void) { //method that updates the game in the background via Firebase //OneSignal S3 ep. 24 withBlock makes it run in the background
     
     //    if UserDefaults.standard.object(forKey: game.gameId) != nil { //check if we have the gameId saved already
     
