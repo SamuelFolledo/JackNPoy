@@ -52,18 +52,16 @@ struct KenAnimationName {
     static let KenPunchHighFinisher = ("kenPunchHighFinisher", 58) //high finisher
     static let KenPunchLowFinisher = ("kenPunchLowFinisher", 51) //low finisher
     
-//    static let KenKickHighLight = ("", ) //high light
-//    static let KenKickHighMedium = ("", )
-//    static let KenKickHighHard = ("", )
-//    static let KenKickLowLight = ("", ) //low light
-//    static let KenKickLowMedium = ("", )
-//    static let KenKickLowHard = ("", )
+    static let KenKickHighLight = ("kenKickHL", 16) //high light
+    static let KenKickHighMedium = ("kenKickHM", 14)
+    static let KenKickHighHard = ("kenKickHH", 21)
+    static let KenKickLowLight = ("kenKickLL", 6) //low light
+    static let KenKickLowMedium = ("kenKickLM", 10)
+    static let KenKickLowHard = ("kenKickLW", 27)
     
     static let KenKickHighFinisher = ("kenKickHighFinisher", 51) //high finisher
-//    static let KenKickLowFinisher = ("kenKickLowFinisher", ) //low finisher
+    static let KenKickLowFinisher = ("kenKickLowFinisher", 115) //low finisher
     
-    //    static let Jump = ("ryuJumpPunch", 32)
-    //    static let Punch = ("ryuJumpPunch", 32)
 }
 
 struct ButtonAnimations {
@@ -157,6 +155,7 @@ class CurrentGameViewController: UIViewController {
 	
 	var kenCounter = 0
 	var kenTimer: Timer?
+    var kenImageName = KenAnimationName.KenStanding
 	
 	var ryuImageName = RyuAnimationName.Standing
 	var ryuCounter = 0
@@ -195,9 +194,16 @@ class CurrentGameViewController: UIViewController {
 		
 		setupBackgroundImageView()
 		
-		player1HPBar.transform = CGAffineTransform(scaleX: -1, y: 1)
+        
+        backgroundTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.backgroundAnimation), userInfo: nil, repeats: true) //to run and animate the background every 0.1 seconds
+        ryuTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.ryuStandingAnimation), userInfo: nil, repeats: true) //run ryu's timer to animate his movements
+        kenTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.kenStandingAnimation), userInfo: nil, repeats: true) //run ken's timer to begin animating his movements
+        
+        player2Character.transform = CGAffineTransform(scaleX: -1, y: 1) //since p2CharacterImageView (ken's) images faces to the right, this will flip it horizontally
+        
+		player1HPBar.transform = CGAffineTransform(scaleX: -1, y: 1) //since hp bar fills up like a loading bar, transform scaleX -1 will flip it, making it work like an HP bar
 		player2HPBar.transform = CGAffineTransform(scaleX: -1, y: 1)
-		player1HPBar.transform = player1HPBar.transform.scaledBy(x: 1, y: 10)
+		player1HPBar.transform = player1HPBar.transform.scaledBy(x: 1, y: 10) // y will also control the height, and x will also control the width
 		player2HPBar.transform = player2HPBar.transform.scaledBy(x: 1, y: 10)
 		
 		
@@ -485,20 +491,12 @@ class CurrentGameViewController: UIViewController {
                     self.player2DamageLabel.isHidden = true
                     
                     if self.game?.winnerUid == nil || self.game?.winnerUid == "" { //if winnerUid is nil then continue the turn cuz game is not over
-//                        if self.player1TagSelected == (nil, nil) || self.player2TagSelected == (nil, nil) {
-//                            print("Player1 or Player 2 Tag is nil")
-//                        } else {
-//                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-//                                print("applied damage to views")
-//                                self.finishTurn()
-//                            }
-//                        }
                         self.finishTurn()
                         
                     } else { //if we have a game.winnerUid!!! so game over
                         self.player1HPLabel.text = self.game?.player1Id == self.game?.winnerUid ? "WIN!" : "LOSE"
                         self.player2HPLabel.text = self.game?.player2Id == self.game?.winnerUid ? "WIN!": "LOSE"
-//                        self.game?.winnerUid = didP1Win == true ? self.game?.player1Id : self.game?.player2Id //assign the game's winnerUid to p1 or p2
+
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5, execute: { //delay
 //                            print("we have results! \(self.game?.winnerUid)")
                             self.gameOver() //run gameOver
@@ -508,6 +506,7 @@ class CurrentGameViewController: UIViewController {
                 
                 
             } else { //snapshot dont exist or not all 4 moves are available
+                print("fetched opponent selected tag, all 4 moves are not available as snapshot")
                 self.player1MovesView.isUserInteractionEnabled = false
                 self.player2MovesView.isUserInteractionEnabled = false
                 self.fetchingOpponentMoveTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.updateCounting), userInfo: nil, repeats: true)// Scheduling timer to Call the function "updateCounting" with the interval of 1 seconds
@@ -715,31 +714,34 @@ class CurrentGameViewController: UIViewController {
 		
 		switch player1TagSelected.attack {
 		case (14): //p1 Light Up
-			ryuImageName = RyuAnimationName.Jump
+			ryuImageName = RyuAnimationName.RyuPunchHighLight
 			player1Damage = CGFloat(p1Button14LUp.damage) * p1Button14LUp.damageMultiplier
 			
 			p1Button14LUp.cooldown = 2
 			p1MoveResult.speed! += 9
 			
 		case (15): //p1 Medium Up
+            ryuImageName = RyuAnimationName.RyuPunchHighMedium
 			player1Damage = CGFloat(p1Button15MUp.damage) * p1Button15MUp.damageMultiplier
 			p1Button15MUp.cooldown = 3
 			p1MoveResult.speed! += 6
 			
 		case (16): //p1 Heavy Up
+            ryuImageName = RyuAnimationName.RyuPunchHighHard
 			player1Damage = CGFloat(p1Button16HUp.damage) * p1Button16HUp.damageMultiplier
 			p1Button16HUp.cooldown = 4
 			
 			p1MoveResult.speed! += 3
 			
 		case (17): //p1 Light Down
+            ryuImageName = RyuAnimationName.RyuPunchLowLight
 			player1Damage = CGFloat(p1Button17LDown.damage) * p1Button17LDown.damageMultiplier
-			
 			p1Button17LDown.cooldown = 2
 			p1MoveResult.speed! += 9
 			
 			
 		case (18): //p1 Medium Down
+            ryuImageName = RyuAnimationName.RyuPunchLowMedium
 			player1Damage = CGFloat(p1Button18MDown.damage) * p1Button18MDown.damageMultiplier
 			
 			p1Button18MDown.cooldown = 3
@@ -747,6 +749,7 @@ class CurrentGameViewController: UIViewController {
 			
 				
 		case (19): //p1 Heavy Down
+            ryuImageName = RyuAnimationName.RyuPunchLowHard
 			player1Damage = CGFloat(p1Button19HDown.damage) * p1Button19HDown.damageMultiplier
 			
 			p1Button19HDown.cooldown = 4
@@ -773,32 +776,38 @@ class CurrentGameViewController: UIViewController {
 		
 		switch player2TagSelected.attack {
 		case (24): //p2 Heavy Up
+            kenImageName = KenAnimationName.KenPunchHighHard
 			player2Damage = CGFloat(p2Button24HUp.damage) * p2Button24HUp.damageMultiplier
 			p2Button24HUp.cooldown = 4
 			p2MoveResult.speed! += 3
 			
 		case (25): //p2 Medium Up
+            kenImageName = KenAnimationName.KenPunchHighMedium
 			player2Damage = CGFloat(p2Button25MUp.damage) * p2Button25MUp.damageMultiplier
 			p2Button25MUp.cooldown = 3
 			p2MoveResult.speed! += 6
 			
 			
 		case (26): //p2 Light Up
+            kenImageName = KenAnimationName.KenPunchHighLight
 			player2Damage = CGFloat(p2Button26LUp.damage) * p2Button26LUp.damageMultiplier
 			p2Button26LUp.cooldown = 2
 			p2MoveResult.speed! += 9
 			
 		case (27): //p2 Heavy Down
+            kenImageName = KenAnimationName.KenPunchLowHard
 			player2Damage = CGFloat(p2Button27HDown.damage) * p2Button27HDown.damageMultiplier
 			p2Button27HDown.cooldown = 4
 			p2MoveResult.speed! += 3
 			
 		case (28): //p2 Medium Down
+            kenImageName = KenAnimationName.KenPunchLowMedium
 			player2Damage = CGFloat(p2Button28MDown.damage) * p2Button28MDown.damageMultiplier
 			p2Button28MDown.cooldown = 3
 			p2MoveResult.speed! += 6
 			
 		case (29): //p2 Light Down
+            kenImageName = KenAnimationName.KenPunchLowLight
 			player2Damage = CGFloat(p2Button29LDown.damage) * p2Button29LDown.damageMultiplier
 			p2Button29LDown.cooldown = 2
 			p2MoveResult.speed! += 9
@@ -903,12 +912,11 @@ class CurrentGameViewController: UIViewController {
 		}
 	}
 	
-	private func setupBackgroundImageView() {
+	private func setupBackgroundImageView() { //method that will randomly select an image for the background
 		let letterArray: [String] = ["A", "B", "C"]
 		guard let letter: String = letterArray.randomElement() else { return }
 		backgroundName = "background\(letter)"
-		
-		switch letter {
+		switch letter { //depending on the selected letter, apply the max counter
 		case "A":
 			bgMaxCounter = 11
 		case "B":
@@ -918,12 +926,6 @@ class CurrentGameViewController: UIViewController {
 		default:
 			break
 		}
-		
-		backgroundTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.backgroundAnimation), userInfo: nil, repeats: true) //to run and change the background every 0.1 seconds
-		
-		ryuTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.ryuStandingAnimation), userInfo: nil, repeats: true)
-		
-		kenTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.kenStandingAnimation), userInfo: nil, repeats: true)
 	}
 	
 	private func updateViewWithGame(currentGame: Game) {
@@ -970,6 +972,169 @@ class CurrentGameViewController: UIViewController {
 		}
 	}
 	
+    
+    func updateButtonsAnimations() { //function that will determine button's animation, either smallFire, BigFire, no animation
+        for button in self.player1AttackButtons! { //check p1 selected buttons and apply the necessary fire animation
+            if button.selectedButton == false { continue }
+            switch button {
+            case self.p1Button14LUp:
+                if button.animation == ButtonAnimations.SmallFire && self.p2MoveResult.defenseMultiplier! != 0 {
+                    
+                    self.removeAttackButtonsAnimation(buttons: self.player1AttackButtons!)
+                    if self.p1Button16HUp.cooldown <= 1 {
+                        self.putAnimation(button: self.p1Button16HUp, animation: ButtonAnimations.BigFire)
+                    }
+                    if self.p1Button19HDown.cooldown <= 1 {
+                        self.putAnimation(button: self.p1Button19HDown, animation: ButtonAnimations.BigFire)
+                    }
+                    
+                } else if self.p1Button15MUp.cooldown <= 1 && self.p1Button17LDown.cooldown <= 1 &&
+                    self.p2MoveResult.defenseMultiplier! != 0 {
+                    if self.p1Button15MUp.cooldown <= 1 {
+                        self.putAnimation(button: self.p1Button15MUp, animation: ButtonAnimations.SmallFire)
+                    }
+                    self.putAnimation(button: self.p1Button17LDown, animation: ButtonAnimations.SmallFire)
+                    if self.p1Button18MDown.cooldown <= 1 {
+                        self.putAnimation(button: self.p1Button18MDown, animation: ButtonAnimations.BigFire)
+                    }
+                } else {
+                    self.removeAttackButtonsAnimation(buttons: self.player1AttackButtons!)
+                    continue
+                }
+            case self.p1Button15MUp:
+                if button.animation == ButtonAnimations.SmallFire && self.p2MoveResult.defenseMultiplier! != 0 {
+                    self.removeAttackButtonsAnimation(buttons: self.player1AttackButtons!)
+                    if self.p1Button16HUp.cooldown <= 1 {
+                        self.putAnimation(button: self.p1Button16HUp, animation: ButtonAnimations.BigFire)
+                    }
+                    if self.p1Button19HDown.cooldown <= 1 {
+                        self.putAnimation(button: self.p1Button19HDown, animation: ButtonAnimations.BigFire)
+                    }
+                } else if self.p1Button14LUp.cooldown <= 1 && self.p1Button17LDown.cooldown <= 1 && self.p2MoveResult.defenseMultiplier! != 0 {
+                    
+                    self.putAnimation(button: self.p1Button14LUp, animation: ButtonAnimations.SmallFire)
+                    self.putAnimation(button: self.p1Button17LDown, animation: ButtonAnimations.SmallFire)
+                    if self.p1Button18MDown.cooldown <= 1 {
+                        self.putAnimation(button: self.p1Button18MDown, animation: ButtonAnimations.BigFire)
+                    }
+                } else {
+                    self.removeAttackButtonsAnimation(buttons: self.player1AttackButtons!)
+                    continue
+                }
+            case self.p1Button16HUp:
+                self.removeAttackButtonsAnimation(buttons: self.player1AttackButtons!)
+            case self.p1Button17LDown:
+                if button.animation == ButtonAnimations.SmallFire && self.p2MoveResult.defenseMultiplier! != 0 {
+                    self.removeAttackButtonsAnimation(buttons: self.player1AttackButtons!)
+                    if self.p1Button16HUp.cooldown <= 1 {
+                        self.putAnimation(button: self.p1Button16HUp, animation: ButtonAnimations.BigFire)
+                    }
+                    if self.p1Button19HDown.cooldown <= 1 {
+                        self.putAnimation(button: self.p1Button19HDown, animation: ButtonAnimations.BigFire)
+                    }
+                } else if self.p1Button15MUp.cooldown <= 1 && self.p1Button14LUp.cooldown <= 1 && self.p2MoveResult.defenseMultiplier! != 0 {
+                    if self.p1Button15MUp.cooldown <= 1 {
+                        self.putAnimation(button: self.p1Button15MUp, animation: ButtonAnimations.SmallFire)
+                    }
+                    self.putAnimation(button: self.p1Button14LUp, animation: ButtonAnimations.SmallFire)
+                    if self.p1Button18MDown.cooldown <= 1 {
+                        self.putAnimation(button: self.p1Button18MDown, animation: ButtonAnimations.BigFire)
+                    }
+                } else {
+                    self.removeAttackButtonsAnimation(buttons: self.player1AttackButtons!)
+                    continue
+                }
+                
+            case self.p1Button18MDown:
+                self.removeAttackButtonsAnimation(buttons: self.player1AttackButtons!)
+            case self.p1Button19HDown:
+                self.removeAttackButtonsAnimation(buttons: self.player1AttackButtons!)
+            default:
+                break
+            }
+        }
+        
+        
+        for button in self.player2AttackButtons! { //check p2 selected buttons and apply the necessary fire animation
+            if button.selectedButton == false { continue }
+            
+            switch button {
+            case self.p2Button26LUp:
+                if button.animation == ButtonAnimations.SmallFire && self.p1MoveResult.defenseMultiplier! != 0 {
+                    self.removeAttackButtonsAnimation(buttons: self.player2AttackButtons!)
+                    
+                    if self.p2Button24HUp.cooldown <= 1 {
+                        self.putAnimation(button: self.p2Button24HUp, animation: ButtonAnimations.BigFire)
+                    }
+                    if self.p2Button27HDown.cooldown <= 1 {
+                        self.putAnimation(button: self.p2Button27HDown, animation: ButtonAnimations.BigFire)
+                    }
+                } else if self.p2Button25MUp.cooldown <= 1 && self.p2Button29LDown.cooldown <= 1 && self.p1MoveResult.defenseMultiplier! != 0 {
+                    
+                    if self.p2Button25MUp.cooldown <= 1 {
+                        self.putAnimation(button: self.p2Button25MUp, animation: ButtonAnimations.SmallFire)
+                    }
+                    self.putAnimation(button: self.p2Button29LDown, animation: ButtonAnimations.SmallFire)
+                    if self.p2Button28MDown.cooldown <= 1 {
+                        self.putAnimation(button: self.p2Button28MDown, animation: ButtonAnimations.BigFire)
+                    }
+                } else {
+                    self.removeAttackButtonsAnimation(buttons: self.player2AttackButtons!)
+                    continue
+                }
+            case self.p2Button25MUp:
+                if button.animation == ButtonAnimations.SmallFire && self.p1MoveResult.defenseMultiplier! != 0 {
+                    self.removeAttackButtonsAnimation(buttons: self.player2AttackButtons!)
+                    if self.p2Button24HUp.cooldown <= 1 {
+                        self.putAnimation(button: self.p2Button24HUp, animation: ButtonAnimations.BigFire)
+                    }
+                    if self.p2Button27HDown.cooldown <= 1 {
+                        self.putAnimation(button: self.p2Button27HDown, animation: ButtonAnimations.BigFire)
+                    }
+                } else if self.p2Button26LUp.cooldown <= 1 && self.p2Button29LDown.cooldown <= 1 && self.p1MoveResult.defenseMultiplier! != 0 {
+                    self.putAnimation(button: self.p2Button26LUp, animation: ButtonAnimations.SmallFire)
+                    self.putAnimation(button: self.p2Button29LDown, animation: ButtonAnimations.SmallFire)
+                    if self.p2Button28MDown.cooldown <= 1 {
+                        self.putAnimation(button: self.p2Button28MDown, animation: ButtonAnimations.BigFire)
+                    }
+                } else {
+                    self.removeAttackButtonsAnimation(buttons: self.player2AttackButtons!)
+                    continue
+                }
+            case self.p2Button24HUp:
+                self.removeAttackButtonsAnimation(buttons: self.player2AttackButtons!)
+            case self.p2Button29LDown:
+                if button.animation == ButtonAnimations.SmallFire && self.p1MoveResult.defenseMultiplier! != 0 {
+                    self.removeAttackButtonsAnimation(buttons: self.player2AttackButtons!)
+                    if self.p2Button24HUp.cooldown <= 1 {
+                        self.putAnimation(button: self.p2Button24HUp, animation: ButtonAnimations.BigFire)
+                    }
+                    if self.p2Button27HDown.cooldown <= 1 {
+                        self.putAnimation(button: self.p2Button27HDown, animation: ButtonAnimations.BigFire)
+                    }
+                } else if self.p2Button25MUp.cooldown <= 1 && self.p2Button26LUp.cooldown <= 1 && self.p1MoveResult.defenseMultiplier! != 0 {
+                    if self.p2Button25MUp.cooldown <= 1 {
+                        self.putAnimation(button: self.p2Button25MUp, animation: ButtonAnimations.SmallFire)
+                    }
+                    self.putAnimation(button: self.p2Button26LUp, animation: ButtonAnimations.SmallFire)
+                    if self.p2Button28MDown.cooldown <= 1 {
+                        self.putAnimation(button: self.p2Button28MDown, animation: ButtonAnimations.BigFire)
+                    }
+                } else {
+                    self.removeAttackButtonsAnimation(buttons: self.player2AttackButtons!)
+                    continue
+                }
+            case self.p2Button28MDown:
+                self.removeAttackButtonsAnimation(buttons: self.player2AttackButtons!)
+            case self.p2Button27HDown:
+                self.removeAttackButtonsAnimation(buttons: self.player2AttackButtons!)
+            default:
+                break
+            }
+        }
+    }
+    
+    
 	private func removeAttackButtonsAnimation(buttons: [MovesButton]) {
 		for button in buttons where button.animation != ButtonAnimations.None {
 			putAnimation(button: button, animation: ButtonAnimations.None)
@@ -988,169 +1153,11 @@ class CurrentGameViewController: UIViewController {
 		}
 	}
 	
+    
     private func finishTurn() {
         DispatchQueue.main.async {
-            
-        //check p1 selected buttons and apply the necessary fire animation
-            for button in self.player1AttackButtons! {
-                if button.selectedButton == false { continue }
-                //                        print("Selected button with animation is \(button.buttonTag)")
-                switch button {
-                case self.p1Button14LUp:
-                    if button.animation == ButtonAnimations.SmallFire && self.p2MoveResult.defenseMultiplier! != 0 {
-                        
-                        self.removeAttackButtonsAnimation(buttons: self.player1AttackButtons!)
-                        if self.p1Button16HUp.cooldown <= 1 {
-                            self.putAnimation(button: self.p1Button16HUp, animation: ButtonAnimations.BigFire)
-                        }
-                        if self.p1Button19HDown.cooldown <= 1 {
-                            self.putAnimation(button: self.p1Button19HDown, animation: ButtonAnimations.BigFire)
-                        }
-                        
-                    } else if self.p1Button15MUp.cooldown <= 1 && self.p1Button17LDown.cooldown <= 1 &&
-                        self.p2MoveResult.defenseMultiplier! != 0 {
-                        if self.p1Button15MUp.cooldown <= 1 {
-                            self.putAnimation(button: self.p1Button15MUp, animation: ButtonAnimations.SmallFire)
-                        }
-                        self.putAnimation(button: self.p1Button17LDown, animation: ButtonAnimations.SmallFire)
-                        if self.p1Button18MDown.cooldown <= 1 {
-                            self.putAnimation(button: self.p1Button18MDown, animation: ButtonAnimations.BigFire)
-                        }
-                    } else {
-                        self.removeAttackButtonsAnimation(buttons: self.player1AttackButtons!)
-                        continue
-                    }
-                case self.p1Button15MUp:
-                    if button.animation == ButtonAnimations.SmallFire && self.p2MoveResult.defenseMultiplier! != 0 {
-                        self.removeAttackButtonsAnimation(buttons: self.player1AttackButtons!)
-                        if self.p1Button16HUp.cooldown <= 1 {
-                            self.putAnimation(button: self.p1Button16HUp, animation: ButtonAnimations.BigFire)
-                        }
-                        if self.p1Button19HDown.cooldown <= 1 {
-                            self.putAnimation(button: self.p1Button19HDown, animation: ButtonAnimations.BigFire)
-                        }
-                    } else if self.p1Button14LUp.cooldown <= 1 && self.p1Button17LDown.cooldown <= 1 && self.p2MoveResult.defenseMultiplier! != 0 {
-                        
-                        self.putAnimation(button: self.p1Button14LUp, animation: ButtonAnimations.SmallFire)
-                        self.putAnimation(button: self.p1Button17LDown, animation: ButtonAnimations.SmallFire)
-                        if self.p1Button18MDown.cooldown <= 1 {
-                            self.putAnimation(button: self.p1Button18MDown, animation: ButtonAnimations.BigFire)
-                        }
-                    } else {
-                        self.removeAttackButtonsAnimation(buttons: self.player1AttackButtons!)
-                        continue
-                    }
-                case self.p1Button16HUp:
-                    self.removeAttackButtonsAnimation(buttons: self.player1AttackButtons!)
-                case self.p1Button17LDown:
-                    if button.animation == ButtonAnimations.SmallFire && self.p2MoveResult.defenseMultiplier! != 0 {
-                        self.removeAttackButtonsAnimation(buttons: self.player1AttackButtons!)
-                        if self.p1Button16HUp.cooldown <= 1 {
-                            self.putAnimation(button: self.p1Button16HUp, animation: ButtonAnimations.BigFire)
-                        }
-                        if self.p1Button19HDown.cooldown <= 1 {
-                            self.putAnimation(button: self.p1Button19HDown, animation: ButtonAnimations.BigFire)
-                        }
-                    } else if self.p1Button15MUp.cooldown <= 1 && self.p1Button14LUp.cooldown <= 1 && self.p2MoveResult.defenseMultiplier! != 0 {
-                        if self.p1Button15MUp.cooldown <= 1 {
-                            self.putAnimation(button: self.p1Button15MUp, animation: ButtonAnimations.SmallFire)
-                        }
-                        self.putAnimation(button: self.p1Button14LUp, animation: ButtonAnimations.SmallFire)
-                        if self.p1Button18MDown.cooldown <= 1 {
-                            self.putAnimation(button: self.p1Button18MDown, animation: ButtonAnimations.BigFire)
-                        }
-                    } else {
-                        self.removeAttackButtonsAnimation(buttons: self.player1AttackButtons!)
-                        continue
-                    }
-                    
-                case self.p1Button18MDown:
-                    self.removeAttackButtonsAnimation(buttons: self.player1AttackButtons!)
-                case self.p1Button19HDown:
-                    self.removeAttackButtonsAnimation(buttons: self.player1AttackButtons!)
-                default:
-                    break
-                }
-            }
-            
-        //check p2 selected buttons and apply the necessary fire animation
-            for button in self.player2AttackButtons! {
-                if button.selectedButton == false { continue }
-                
-                switch button {
-                case self.p2Button26LUp:
-                    if button.animation == ButtonAnimations.SmallFire && self.p1MoveResult.defenseMultiplier! != 0 {
-                        self.removeAttackButtonsAnimation(buttons: self.player2AttackButtons!)
-                        
-                        if self.p2Button24HUp.cooldown <= 1 {
-                            self.putAnimation(button: self.p2Button24HUp, animation: ButtonAnimations.BigFire)
-                        }
-                        if self.p2Button27HDown.cooldown <= 1 {
-                            self.putAnimation(button: self.p2Button27HDown, animation: ButtonAnimations.BigFire)
-                        }
-                    } else if self.p2Button25MUp.cooldown <= 1 && self.p2Button29LDown.cooldown <= 1 && self.p1MoveResult.defenseMultiplier! != 0 {
-                        
-                        if self.p2Button25MUp.cooldown <= 1 {
-                            self.putAnimation(button: self.p2Button25MUp, animation: ButtonAnimations.SmallFire)
-                        }
-                        self.putAnimation(button: self.p2Button29LDown, animation: ButtonAnimations.SmallFire)
-                        if self.p2Button28MDown.cooldown <= 1 {
-                            self.putAnimation(button: self.p2Button28MDown, animation: ButtonAnimations.BigFire)
-                        }
-                    } else {
-                        self.removeAttackButtonsAnimation(buttons: self.player2AttackButtons!)
-                        continue
-                    }
-                case self.p2Button25MUp:
-                    if button.animation == ButtonAnimations.SmallFire && self.p1MoveResult.defenseMultiplier! != 0 {
-                        self.removeAttackButtonsAnimation(buttons: self.player2AttackButtons!)
-                        if self.p2Button24HUp.cooldown <= 1 {
-                            self.putAnimation(button: self.p2Button24HUp, animation: ButtonAnimations.BigFire)
-                        }
-                        if self.p2Button27HDown.cooldown <= 1 {
-                            self.putAnimation(button: self.p2Button27HDown, animation: ButtonAnimations.BigFire)
-                        }
-                    } else if self.p2Button26LUp.cooldown <= 1 && self.p2Button29LDown.cooldown <= 1 && self.p1MoveResult.defenseMultiplier! != 0 {
-                        self.putAnimation(button: self.p2Button26LUp, animation: ButtonAnimations.SmallFire)
-                        self.putAnimation(button: self.p2Button29LDown, animation: ButtonAnimations.SmallFire)
-                        if self.p2Button28MDown.cooldown <= 1 {
-                            self.putAnimation(button: self.p2Button28MDown, animation: ButtonAnimations.BigFire)
-                        }
-                    } else {
-                        self.removeAttackButtonsAnimation(buttons: self.player2AttackButtons!)
-                        continue
-                    }
-                case self.p2Button24HUp:
-                    self.removeAttackButtonsAnimation(buttons: self.player2AttackButtons!)
-                case self.p2Button29LDown:
-                    if button.animation == ButtonAnimations.SmallFire && self.p1MoveResult.defenseMultiplier! != 0 {
-                        self.removeAttackButtonsAnimation(buttons: self.player2AttackButtons!)
-                        if self.p2Button24HUp.cooldown <= 1 {
-                            self.putAnimation(button: self.p2Button24HUp, animation: ButtonAnimations.BigFire)
-                        }
-                        if self.p2Button27HDown.cooldown <= 1 {
-                            self.putAnimation(button: self.p2Button27HDown, animation: ButtonAnimations.BigFire)
-                        }
-                    } else if self.p2Button25MUp.cooldown <= 1 && self.p2Button26LUp.cooldown <= 1 && self.p1MoveResult.defenseMultiplier! != 0 {
-                        if self.p2Button25MUp.cooldown <= 1 {
-                            self.putAnimation(button: self.p2Button25MUp, animation: ButtonAnimations.SmallFire)
-                        }
-                        self.putAnimation(button: self.p2Button26LUp, animation: ButtonAnimations.SmallFire)
-                        if self.p2Button28MDown.cooldown <= 1 {
-                            self.putAnimation(button: self.p2Button28MDown, animation: ButtonAnimations.BigFire)
-                        }
-                    } else {
-                        self.removeAttackButtonsAnimation(buttons: self.player2AttackButtons!)
-                        continue
-                    }
-                case self.p2Button28MDown:
-                    self.removeAttackButtonsAnimation(buttons: self.player2AttackButtons!)
-                case self.p2Button27HDown:
-                    self.removeAttackButtonsAnimation(buttons: self.player2AttackButtons!)
-                default:
-                    break
-                }
-            }
+            self.updateButtonsAnimations()
+        
             
             self.player1TagSelected = (nil, nil)
             self.player2TagSelected = (nil, nil)
@@ -1211,9 +1218,14 @@ class CurrentGameViewController: UIViewController {
 	}
 	
 	@objc func kenStandingAnimation() {
-		player2Character.image = UIImage(named: "ken\(kenCounter)")
+		player2Character.image = UIImage(named: "\(kenImageName.0)\(kenCounter)") //p2's image will be whatever kenImageName is assigned as with an incrementing kenCounter
 		kenCounter += 1
-		if kenCounter == 13 { kenCounter = 0 }
+        if kenCounter == kenImageName.1 { //if kenCounter is = to kenImageName's maxCounter, then go back to 0
+            kenCounter = 0
+            if kenImageName != KenAnimationName.KenStanding { //once that animation is over, go back to standing animation
+                kenImageName = KenAnimationName.KenStanding
+            }
+        }
 	}
 	
 	@objc func backgroundAnimation() {

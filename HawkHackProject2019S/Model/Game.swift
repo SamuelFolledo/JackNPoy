@@ -42,13 +42,6 @@ class Game {
 	static let sharedInstance = Game() //initialize this Game as singleton
 	private init() {} //PB ep75 2mins this prevents reinitialization. This prevents us to invoke the ShoppingCart.init(), the access of this class is only through sharedInstance
 	
-//    init(_historyDictionary: [String: Any]) {
-////        [kRESULT: "W", kOPPONENTUID: opponentUid, kOPPONENTNAME: opponentName, kOPPONENTAVATARTURL: opponentAvatarUrl, kHPLEFT: hpLeft, kGAMEID: self.game!.gameId]
-//        self.gameId = _historyDictionary[kGAMEID] as! String
-//        self.createdAt =
-//
-//    }
-    
 	init(_dictionary: [String: Any]) { //constructor
 		self.player1Id = _dictionary[kPLAYER1ID] as? String
 		self.text = _dictionary["text"] as? String
