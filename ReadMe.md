@@ -13,15 +13,15 @@ It's very simple,
 
 ### Future features
 Flow and fiero
-• Reward system for leveling up
-    ◦ At level 5 allows you the group chat room
-    ◦ At level 8, unlock your own house
-    ◦ At level 10 unlock  Pet room
-    ◦ At level 20 unlock 2nd floor
-    ◦ At level 50 unlock Mansion mode
-• Reward system for consistent playing time
-• Reward system for playing more games in one day
-• Different game modes
-    ◦ Normal mode
-    ◦ Fast mode
-    ◦ Super saiyan mode
+- Reward system for leveling up
+    -  At level 5 allows you the group chat room
+    -  At level 8, unlock your own house
+    -  At level 10 unlock  Pet room
+    -  At level 20 unlock 2nd floor
+    -  At level 50 unlock Mansion mode
+-  Reward system for consistent playing time
+-  Reward system for playing more games in one day
+-  Different game modes
+    - Normal mode
+    - Fast mode
+    - Super saiyan mode
