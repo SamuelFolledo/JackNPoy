@@ -7,9 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3341F6F72354EDCA008DD935 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3341F6F62354EDCA008DD935 /* GoogleService-Info.plist */; };
 		7E6DFDD5228CE3ED00D19B0A /* GameOverViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E62218C228B56D3005C5312 /* GameOverViewController.swift */; };
 		7E8C908F2278A10C0057AA3E /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E8C908E2278A10C0057AA3E /* File.swift */; };
-		7E9BAA87224FCD8C003C6D22 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7E9BAA86224FCD8C003C6D22 /* GoogleService-Info.plist */; };
+		7E9BAA87224FCD8C003C6D22 /* GoogleService-Info-old.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7E9BAA86224FCD8C003C6D22 /* GoogleService-Info-old.plist */; };
 		7E9BAA8D224FD017003C6D22 /* MyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E9BAA8C224FD017003C6D22 /* MyView.swift */; };
 		7E9BAA8F224FD064003C6D22 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E9BAA8E224FD064003C6D22 /* Message.swift */; };
 		7E9BAA91224FD089003C6D22 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E9BAA90224FD089003C6D22 /* User.swift */; };
@@ -47,10 +48,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3341F6F62354EDCA008DD935 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		7E03271E22C3588900CE0178 /* HawkHackProject2019S.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HawkHackProject2019S.entitlements; sourceTree = "<group>"; };
 		7E62218C228B56D3005C5312 /* GameOverViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameOverViewController.swift; sourceTree = "<group>"; };
 		7E8C908E2278A10C0057AA3E /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
-		7E9BAA86224FCD8C003C6D22 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		7E9BAA86224FCD8C003C6D22 /* GoogleService-Info-old.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info-old.plist"; sourceTree = "<group>"; };
 		7E9BAA8C224FD017003C6D22 /* MyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyView.swift; sourceTree = "<group>"; };
 		7E9BAA8E224FD064003C6D22 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		7E9BAA90224FD089003C6D22 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -245,7 +247,8 @@
 				7EE876F4224FC55A00B53E7E /* Assets.xcassets */,
 				7EE876F6224FC55A00B53E7E /* LaunchScreen.storyboard */,
 				7EE876F9224FC55A00B53E7E /* Info.plist */,
-				7E9BAA86224FCD8C003C6D22 /* GoogleService-Info.plist */,
+				3341F6F62354EDCA008DD935 /* GoogleService-Info.plist */,
+				7E9BAA86224FCD8C003C6D22 /* GoogleService-Info-old.plist */,
 			);
 			path = HawkHackProject2019S;
 			sourceTree = "<group>";
@@ -345,11 +348,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				7EE876F8224FC55A00B53E7E /* LaunchScreen.storyboard in Resources */,
-				7E9BAA87224FCD8C003C6D22 /* GoogleService-Info.plist in Resources */,
+				7E9BAA87224FCD8C003C6D22 /* GoogleService-Info-old.plist in Resources */,
 				7E9BAAB5225004E7003C6D22 /* ChatTableViewCell.xib in Resources */,
 				7EE876F3224FC55500B53E7E /* Main.storyboard in Resources */,
 				7ED77BAA2294A33400363D5B /* Assets.xcassets in Resources */,
 				7E9BAAB9225004FD003C6D22 /* MatchesTableViewCell.xib in Resources */,
+				3341F6F72354EDCA008DD935 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
