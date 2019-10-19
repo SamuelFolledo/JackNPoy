@@ -10,9 +10,7 @@ import UIKit
 
 class LoginViewController: UIViewController {
 	
-	
-	//MARK: IBOutlets
-	
+//MARK: IBOutlets
 	@IBOutlet weak var emailTextField: UITextField!
 	@IBOutlet weak var passwordTextField: UITextField!
 	@IBOutlet weak var loginButton: UIButton!
@@ -20,15 +18,14 @@ class LoginViewController: UIViewController {
 	@IBOutlet weak var emailView: MyView!
 	@IBOutlet weak var passwordView: MyView!
 	
-	// MARK: - Properties
+// MARK: - Properties
 //	private var client: LoginClient?
 	
-	// MARK: - Lifecycle
+// MARK: - Lifecycle
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
 		setupViews()
-		
 	}
 	
 	override func viewWillAppear(_ animated: Bool) {
@@ -47,7 +44,6 @@ class LoginViewController: UIViewController {
 			}
 			Service.alertWithActions(on: self, actions: [logoutAction, noAction], title: "Hello \(User.currentUser()!.name)", message: "In order to log in, you need to log out first. Would you like to log out?")
 		}
-		
 	}
 	
 	
@@ -67,7 +63,6 @@ class LoginViewController: UIViewController {
 		
 		let tap = UITapGestureRecognizer(target: self, action: #selector(handleDismissTap(_:)))
 		self.view.addGestureRecognizer(tap)
-		
 	}
 	
 	//login
@@ -89,7 +84,6 @@ class LoginViewController: UIViewController {
 		} else {
 			emailView.layer.borderColor = kCLEARCGCOLOR
 		}
-		
 		if password.count < 6 {
 			errorCounter += 1
 			self.passwordView.layer.borderColor = kREDCGCOLOR
@@ -98,7 +92,6 @@ class LoginViewController: UIViewController {
 		} else {
 			passwordView.layer.borderColor = kCLEARCGCOLOR
 		}
-		
 		
 		switch errorCounter {
 		case 0:
@@ -126,25 +119,21 @@ class LoginViewController: UIViewController {
 			Service.presentAlert(on: self, title: "Error", message: "There are errors on the field. Please try again.")
 			return
 		}
-		
 	}
 	
-	//MARK: Helpers
+//MARK: Helpers
 	@objc func handleDismissTap(_ gesture: UITapGestureRecognizer) { //dismiss fields
 		self.view.endEditing(false)
 	}
 	
-	// MARK: - Actions
+// MARK: - Actions
 	@IBAction func loginButtonTapped(_ sender: Any) {
 		login()
 	}
 	
-	
-	
-	
-	
 }
 
+//MARK: Extensions
 extension LoginViewController: UITextFieldDelegate {
 	
 	func textFieldShouldReturn(_ textField: UITextField) -> Bool {

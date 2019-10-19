@@ -82,7 +82,7 @@ class CurrentGameViewController: UIViewController {
 	@IBOutlet weak var player1ImageView: UIImageView!
 	@IBOutlet weak var player1HPLabel: UILabel!
 	@IBOutlet weak var player1DamageLabel: UILabel!
-	@IBOutlet weak var player1Character: UIImageView!
+	@/Users/macbookpro15/Library/Mobile Documents/com~apple~CloudDocs/HawkHackProject2019S/HawkHackProject2019S/Controllers/Game/CurrentGameViewController.swiftIBOutlet weak var player1Character: UIImageView!
 	@IBOutlet weak var player1MovesView: MyView!
 	@IBOutlet weak var player1HPBar: UIProgressView!
     @IBOutlet weak var player1IsFirstImageView: UIImageView!
@@ -945,13 +945,11 @@ class CurrentGameViewController: UIViewController {
             self.player2ImageView.downloaded(fromLink: "\(currentGame.player2AvatarUrl!)")
 //            self.player2ImageView.image = currentGame.player2Image
 			
-            
 			self.player1NameLabel.text = "\(currentGame.player1Name!)"
 			self.player1HPLabel.text = "\(currentGame.player1HP)/30"
 			
 			self.player2NameLabel.text = "\(currentGame.player2Name!)"
 			self.player2HPLabel.text = "\(currentGame.player2HP)/30"
-			
 			
 			if currentGame.player1Id == currentGame.player2Id { //if user is playing against itself
 				self.player1MovesView.isUserInteractionEnabled = true
