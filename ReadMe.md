@@ -1,4 +1,5 @@
 # Welcome to Jack N' Poy
+A simple but addicting online game playable on 2 different devices or on the same device. Inspired by a child's Rock Paper Scissor game but with twice or maybe more the possibilities and moves to choose from. Meaning, __you will lose at least 1 if not all games every 10 games you play__ 
 
 ## Play style
 It's very simple, 
@@ -25,3 +26,49 @@ Flow and fiero
     - Normal mode
     - Fast mode
     - Super saiyan mode
+
+
+## Screenshots of how the app looks like
+### __CurrentGameVC__ - Game just started with full HP (originally 100HP but 30HP here for faster testing purposes)
+<img src="https://github.com/SamuelFolledo/JackNPoy/blob/master/screenshots/GameVC_30HP.PNG" width="1104" height="621">
+
+---
+
+### __CurrentGameVC-attacking__ - shows attack animations when timer runs out and HP bar going down
+<img src="https://github.com/SamuelFolledo/JackNPoy/blob/master/screenshots/GameVC_attacking.PNG" width="1104" height="621">
+
+---
+
+### __CurrentGameVC-ended__ - shows who won before going to GameOverVC
+<img src="https://github.com/SamuelFolledo/JackNPoy/blob/master/screenshots/GameVC_ended.PNG" width="1104" height="621">
+
+---
+
+### __GameOverVC__ - GameOver VC for winners, showing current user's image and how much experience you gained and how it affected your experience bar
+<img src="https://github.com/SamuelFolledo/JackNPoy/blob/master/screenshots/GameOverVC_YouWin.PNG" width= width="1104" height="621">
+
+
+---
+
+### __PreGameVC__ - Invite other users via email, and decline or accept game invitations from other users
+<img src="https://github.com/SamuelFolledo/JackNPoy/blob/master/screenshots/PreGameVC.PNG" width= width="1104" height="621">
+
+---
+
+
+### __GameHistoryVC__ - Displays game history results, opponent and current user's info like win/lose, level, experience, name, etc.
+<img src="https://github.com/SamuelFolledo/JackNPoy/blob/master/screenshots/GameHistory.PNG" width= width="1104" height="621">
+
+---
+
+### __MainMenuVC__ - home/main screen which welcomes user with 3 buttons (Login/Play/Chat). No fancy UI
+<img src="https://github.com/SamuelFolledo/JackNPoy/blob/master/screenshots/HomeVC.PNG" width= width="1104" height="621">
+
+
+---
+### __ChatVC__ - chat with other users that plays the game
+<img src="https://github.com/SamuelFolledo/JackNPoy/blob/master/screenshots/ChatVC.PNG" width= width="1104" height="621">
+
+---
+
+
