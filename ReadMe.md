@@ -45,29 +45,29 @@ Flow and fiero
 ---
 
 ### __GameOverVC__ - GameOver VC for winners, showing current user's image and how much experience you gained and how it affected your experience bar
-<img src="https://github.com/SamuelFolledo/JackNPoy/blob/master/screenshots/GameOverVC_YouWin.PNG" width= width="1104" height="621">
+<img src="https://github.com/SamuelFolledo/JackNPoy/blob/master/screenshots/GameOverVC_YouWin.PNG" width="1104" height="621">
 
 
 ---
 
 ### __PreGameVC__ - Invite other users via email, and decline or accept game invitations from other users
-<img src="https://github.com/SamuelFolledo/JackNPoy/blob/master/screenshots/PreGameVC.PNG" width= width="1104" height="621">
+<img src="https://github.com/SamuelFolledo/JackNPoy/blob/master/screenshots/PreGameVC.PNG" width="1104" height="621">
 
 ---
 
 
 ### __GameHistoryVC__ - Displays game history results, opponent and current user's info like win/lose, level, experience, name, etc.
-<img src="https://github.com/SamuelFolledo/JackNPoy/blob/master/screenshots/GameHistory.PNG" width= width="1104" height="621">
+<img src="https://github.com/SamuelFolledo/JackNPoy/blob/master/screenshots/GameHistory.PNG" width="1104" height="621">
 
 ---
 
 ### __MainMenuVC__ - home/main screen which welcomes user with 3 buttons (Login/Play/Chat). No fancy UI
-<img src="https://github.com/SamuelFolledo/JackNPoy/blob/master/screenshots/HomeVC.PNG" width= width="1104" height="621">
+<img src="https://github.com/SamuelFolledo/JackNPoy/blob/master/screenshots/HomeVC.PNG" width="1104" height="621">
 
 
 ---
 ### __ChatVC__ - chat with other users that plays the game
-<img src="https://github.com/SamuelFolledo/JackNPoy/blob/master/screenshots/ChatVC.PNG" width= width="1104" height="621">
+<img src="https://github.com/SamuelFolledo/JackNPoy/blob/master/screenshots/ChatVC.PNG" width="1104" height="621">
 
 ---
 
