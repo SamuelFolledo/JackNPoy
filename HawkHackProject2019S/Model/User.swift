@@ -10,14 +10,12 @@ import Foundation
 import Firebase
 import FirebaseAuth
 
-
 class User: NSObject {
 	var name: String
 	var email: String
 	var avatarURL: String
 	var userID: String
     var pushId: String? //OneSignal Id
-    
 //    var winLoseStat: [Int: Int] //win/lose
     var wins: Int?
     var loses: Int?
@@ -32,7 +30,6 @@ class User: NSObject {
 		name = _name
 		email = _email
 		avatarURL = _avatarURL
-        
         wins = _wins
         loses = _loses
         matchesDictionary = _matchesDictionary
@@ -47,7 +44,6 @@ class User: NSObject {
         name = _name
         email = _email
         avatarURL = _avatarURL
-        
         experience = _experience
         level = _level
     }
@@ -59,7 +55,6 @@ class User: NSObject {
         name = _name
         email = _email
         avatarURL = _avatarURL
-        
         wins = _wins
         loses = _loses
         experience = _experience
@@ -104,7 +99,6 @@ class User: NSObject {
 		return nil //if we dont have user in our UserDefaults, then return nil
 	}
 	
-	
 	class func registerUserWith(email: String, password: String, completion: @escaping (_ error: Error?) -> Void) {
 		Auth.auth().createUser(withEmail: email, password: password) { (firUser, error) in
 			if let error = error {
@@ -133,14 +127,12 @@ class User: NSObject {
 			})
 		}
 	}
-	
-	
-	//MARK: Logout
+		
+//MARK: Logout
 	class func logOutCurrentUser(withBlock: (_ success: Bool) -> Void) {
 		print("Logging outttt...")
 		UserDefaults.standard.removeObject(forKey: kCURRENTUSER)
 		UserDefaults.standard.synchronize() //save the changes
-		
 		do {
 			try Auth.auth().signOut()
 			withBlock(true)
@@ -149,7 +141,6 @@ class User: NSObject {
 			withBlock(false)
 		}
 	}
-	
 	
 	class func deleteUser(completion: @escaping(_ error: Error?) -> Void) { //delete the current user
 		let user = Auth.auth().currentUser
@@ -163,8 +154,6 @@ class User: NSObject {
 //
 //        }
 //    }
-    
-	
 }
 
 //+++++++++++++++++++++++++   MARK: Saving user   ++++++++++++++++++++++++++++++++++
@@ -172,8 +161,6 @@ func saveUserInBackground(user: User) {
 	let ref = firDatabase.child(kUSERS).child(user.userID)
 	ref.setValue(userDictionaryFrom(user: user))
 	print("Finished saving user \(user.name) in Firebase")
-    
-    
 }
 
 //save locally
