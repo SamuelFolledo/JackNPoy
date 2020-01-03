@@ -82,7 +82,7 @@ class CurrentGameViewController: UIViewController {
 	@IBOutlet weak var player1ImageView: UIImageView!
 	@IBOutlet weak var player1HPLabel: UILabel!
 	@IBOutlet weak var player1DamageLabel: UILabel!
-	@/Users/macbookpro15/Library/Mobile Documents/com~apple~CloudDocs/HawkHackProject2019S/HawkHackProject2019S/Controllers/Game/CurrentGameViewController.swiftIBOutlet weak var player1Character: UIImageView!
+	@IBOutlet weak var player1Character: UIImageView!
 	@IBOutlet weak var player1MovesView: MyView!
 	@IBOutlet weak var player1HPBar: UIProgressView!
     @IBOutlet weak var player1IsFirstImageView: UIImageView!
@@ -187,13 +187,9 @@ class CurrentGameViewController: UIViewController {
 //MARK: LifeCycle -----------------------------------------------------
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
-		
 		setupPlayersButtons()
 		
 		setupBackgroundImageView()
-		
         
         backgroundTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.backgroundAnimation), userInfo: nil, repeats: true) //to run and animate the background every 0.1 seconds
         ryuTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.ryuStandingAnimation), userInfo: nil, repeats: true) //run ryu's timer to animate his movements
@@ -205,9 +201,6 @@ class CurrentGameViewController: UIViewController {
 		player2HPBar.transform = CGAffineTransform(scaleX: -1, y: 1)
 		player1HPBar.transform = player1HPBar.transform.scaledBy(x: 1, y: 10) // y will also control the height, and x will also control the width
 		player2HPBar.transform = player2HPBar.transform.scaledBy(x: 1, y: 10)
-		
-		
-		
 		
 		updateViewWithGame(currentGame: game!)
 		
@@ -225,8 +218,6 @@ class CurrentGameViewController: UIViewController {
             }
         }
 		startTurnTimer()
-        
-//        uploadGameToFirebase(withGame: game!)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -308,8 +299,6 @@ class CurrentGameViewController: UIViewController {
 		default:
 			break
 		}
-		
-//		button.setBackgroundImage(UIImage.animatedImage(with: images, duration: duration), for: .normal)
 	}
 	
 	
@@ -317,10 +306,8 @@ class CurrentGameViewController: UIViewController {
 	private func setupPlayersButtons() { //sets up the attributes of the buttons
 		player1MoveButtons = [p1Button10Up, p1Button11Back, p1Button12Down, p1Button13Forward]
 		player1AttackButtons = [p1Button14LUp, p1Button15MUp, p1Button16HUp, p1Button17LDown, p1Button18MDown, p1Button19HDown]
-		
 		player2MoveButtons = [p2Button20Up, p2Button21Forward, p2Button22Down, p2Button23Back]
 		player2AttackButtons = [p2Button24HUp, p2Button25MUp, p2Button26LUp, p2Button27HDown, p2Button28MDown, p2Button29LDown]
-		
 		self.allButtons = (player1MoveButtons! + player1AttackButtons! + player2MoveButtons! + player2AttackButtons!)
 		
 		p1Button10Up.buttonTag = 10
@@ -384,8 +371,6 @@ class CurrentGameViewController: UIViewController {
             p2MoveResult = (damage:0, damageMultiplier:CGFloat(1), defenseMultiplier:CGFloat(1), speed: CGFloat(1)) //give p2 +1 speed boost
             p1MoveResult = (damage:0, damageMultiplier:1, defenseMultiplier:1, speed:0)
         }
-        
-        
 		clockTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.updateTurnTime), userInfo: nil, repeats: true) //Once the round is ready, start the timer
 	}
 	
@@ -412,7 +397,6 @@ class CurrentGameViewController: UIViewController {
                 }
             })
 //            return
-            
         } else { //if we are playing against someone online...
             if User.currentId() == self.game?.player1Id { //if our current user is p1 then upload p1's selectedTag and fetch p2's selectedTag
                 self.player1TagSelected.move = player1TagSelected.move == nil ? 1 : player1TagSelected.move
@@ -464,7 +448,6 @@ class CurrentGameViewController: UIViewController {
                 }
                 guard let fetchedOpponentAttack = resultDic["\(p1OrP2String)AttackTag"] as? Int else { print("No opponentAttack found"); return }
                 
-                
                 if p1OrP2String == "p1" {
                     self.player1TagSelected = (fetchedOpponentMove, fetchedOpponentAttack) //assign our fetched opponentMove to our p1
                     for button in self.player1AttackButtons! where self.player1TagSelected.attack == button.buttonTag { //declare that they are a selected button
@@ -504,7 +487,6 @@ class CurrentGameViewController: UIViewController {
                     }
                 })
                 
-                
             } else { //snapshot dont exist or not all 4 moves are available
                 print("fetched opponent selected tag, all 4 moves are not available as snapshot")
                 self.player1MovesView.isUserInteractionEnabled = false
@@ -526,12 +508,9 @@ class CurrentGameViewController: UIViewController {
         
         ryuCounter = 0
         
-        
-        
         //get p1 and p2 damage
         var player1Damage = Int(CGFloat(p1MoveResult.damage!) * p1MoveResult.damageMultiplier! * p2MoveResult.defenseMultiplier!)
         var player2Damage = Int(CGFloat(p2MoveResult.damage!) * p2MoveResult.damageMultiplier! * p1MoveResult.defenseMultiplier!)
-        
     
         if p1MoveResult.speed! > p2MoveResult.speed! { //if p1 is first then lower p2's damage
             switch player1TagSelected.attack {
@@ -562,12 +541,9 @@ class CurrentGameViewController: UIViewController {
                 print("Weird p2 tag")
             }
         }
-        
         //            print("P1 Damage = \(player1Damage)\nP2 Damage = \(player2Damage)")
         //            print("P1 speed = \(p1MoveResult.speed)\nP2 speed = \(p2MoveResult.speed)")
         //        print("P1 \(p1MoveResult)\nP2 \(p2MoveResult)")
-        
-        
         if player1Damage > 0 { //displays the damage if p1's damage is greater than 0
             player2DamageLabel.text = "-\(player1Damage)"
             player2DamageLabel.isHidden = false
@@ -579,23 +555,19 @@ class CurrentGameViewController: UIViewController {
             player1DamageLabel.pulsate()
         }
         
-        
         if CGFloat(p1MoveResult.speed!) > CGFloat(p2MoveResult.speed!) { //if p1 first
             //            print("p1 first")
             self.game!.player2HP -= player1Damage
             self.player2HPProgress.completedUnitCount += Int64(player1Damage)
             let player2ProgressFloat = Float(self.player2HPProgress.fractionCompleted)
             self.player2HPBar.setProgress(player2ProgressFloat, animated: true)
-            
             p1HasSpeedBoost = true //set it to true so we can give p1 a +1 speed for next turn
 //            player2Damage = Int(CGFloat(player2Damage) * 0.9) //gives a little incentive to go first by reducing damage received by 10% if a player moves first
-            
             if game!.player2HP > 0 { //if p2 is still alive
                 self.game!.player1HP -= player2Damage
                 self.player1HPProgress.completedUnitCount += Int64(player2Damage)
                 let player1ProgressFloat = Float(self.player1HPProgress.fractionCompleted)
                 self.player1HPBar.setProgress(player1ProgressFloat, animated: true)
-                
                 if game!.player1HP <= 0 { //if p1 dies
                     game?.winnerUid = game?.player2Id
 //                    completion(false)
@@ -607,7 +579,6 @@ class CurrentGameViewController: UIViewController {
                 game?.winnerUid = game?.player1Id
 //                completion(true)
             }
-            
         } else { //if p2 first
             //            print("p2 first")
             self.game!.player1HP -= player2Damage
@@ -617,13 +588,11 @@ class CurrentGameViewController: UIViewController {
             
             p1HasSpeedBoost = false //p2 will have +1 speed boost
 //            player1Damage = Int(CGFloat(player1Damage) * 0.9)
-            
             if game!.player1HP > 0 { //if p1 is still alive
                 self.game!.player2HP -= player1Damage
                 self.player2HPProgress.completedUnitCount += Int64(player1Damage)
                 let player2ProgressFloat = Float(self.player2HPProgress.fractionCompleted)
                 self.player2HPBar.setProgress(player2ProgressFloat, animated: true)
-                
                 if game!.player2HP <= 0 { //if p2 dies
                     game?.winnerUid = game?.player1Id
 //                    completion(true)
@@ -632,14 +601,11 @@ class CurrentGameViewController: UIViewController {
                     self.player1HPLabel.text = "\(game!.player1HP)/30"
                     self.player2HPLabel.text = "\(game!.player2HP)/30"
                 }
-                
             } else { //if p1 dies
                 game?.winnerUid = game?.player2Id
 //                completion(false)
             }
         }
-        
-        
         
         if isAgainstOnlineUser { //if we are against an online user then save locally
             updateCurrentGame(game: game!, withValues: ["round\(game!.roundNumber)": [player1TagSelected.move, player1TagSelected.attack, player2TagSelected.move, player2TagSelected.attack, game!.player1HP, game!.player2HP]]) { (error) in //update the game in background in Firebase
@@ -649,7 +615,6 @@ class CurrentGameViewController: UIViewController {
                 }
             }
         }
-        
         completion()
     }
     
@@ -661,7 +626,6 @@ class CurrentGameViewController: UIViewController {
         if !isAgainstOnlineUser { //if we are not against another user, update user and delete reference to the game
             increaseExperience(user: currentUser, gained: 1, completion: { //increase user's experience by 1
                 let statsValues: [String: Int] = [kEXPERIENCES: currentUser.experience, kLEVEL: currentUser.level] //if currentUser won, then increase win by 1 and exp by 100 || lose by 1 and exp by 10
-                
                 updateCurrentUser(withValues: statsValues, withBlock: { (hasError) in //updateCurrent User first with statsValues then update the userRef
                     if !hasError {
                         Service.presentAlert(on: self, title: "Error", message: "Error updating user")
@@ -699,7 +663,6 @@ class CurrentGameViewController: UIViewController {
                 }
             }
         }
-        
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
             self.performSegue(withIdentifier: "toGameOverSegue", sender: nil)
         }
@@ -709,14 +672,10 @@ class CurrentGameViewController: UIViewController {
 	
 	private func getPlayer1Damage() {
 		var player1Damage: CGFloat = 0
-		
-		
-		
 		switch player1TagSelected.attack {
 		case (14): //p1 Light Up
 			ryuImageName = RyuAnimationName.RyuPunchHighLight
 			player1Damage = CGFloat(p1Button14LUp.damage) * p1Button14LUp.damageMultiplier
-			
 			p1Button14LUp.cooldown = 2
 			p1MoveResult.speed! += 9
 			
@@ -730,7 +689,6 @@ class CurrentGameViewController: UIViewController {
             ryuImageName = RyuAnimationName.RyuPunchHighHard
 			player1Damage = CGFloat(p1Button16HUp.damage) * p1Button16HUp.damageMultiplier
 			p1Button16HUp.cooldown = 4
-			
 			p1MoveResult.speed! += 3
 			
 		case (17): //p1 Light Down
@@ -739,19 +697,16 @@ class CurrentGameViewController: UIViewController {
 			p1Button17LDown.cooldown = 2
 			p1MoveResult.speed! += 9
 			
-			
 		case (18): //p1 Medium Down
             ryuImageName = RyuAnimationName.RyuPunchLowMedium
 			player1Damage = CGFloat(p1Button18MDown.damage) * p1Button18MDown.damageMultiplier
 			
 			p1Button18MDown.cooldown = 3
 			p1MoveResult.speed! += 6
-			
 				
 		case (19): //p1 Heavy Down
             ryuImageName = RyuAnimationName.RyuPunchLowHard
 			player1Damage = CGFloat(p1Button19HDown.damage) * p1Button19HDown.damageMultiplier
-			
 			p1Button19HDown.cooldown = 4
 			p1MoveResult.speed! += 3
 			
@@ -765,7 +720,6 @@ class CurrentGameViewController: UIViewController {
 		for button in player1MoveButtons! where button.selectedButton == true { //put p1 move on cooldown
 			button.cooldown = 2
 		}
-		
 		p1MoveResult.damage = Int(player1Damage)
 //        print("player 1 damage = \(p1MoveResult.damage)")
 	}
@@ -773,7 +727,6 @@ class CurrentGameViewController: UIViewController {
 
 	private func getPlayer2Damage() {
 		var player2Damage: CGFloat = 0
-		
 		switch player2TagSelected.attack {
 		case (24): //p2 Heavy Up
             kenImageName = KenAnimationName.KenPunchHighHard
@@ -786,7 +739,6 @@ class CurrentGameViewController: UIViewController {
 			player2Damage = CGFloat(p2Button25MUp.damage) * p2Button25MUp.damageMultiplier
 			p2Button25MUp.cooldown = 3
 			p2MoveResult.speed! += 6
-			
 			
 		case (26): //p2 Light Up
             kenImageName = KenAnimationName.KenPunchHighLight
@@ -819,9 +771,6 @@ class CurrentGameViewController: UIViewController {
 			break
 		}
 		
-		
-		
-		
 		for button in player2MoveButtons! where button.selectedButton == true { //put p2 move on cooldown
 			button.cooldown = 2
 		}
@@ -841,7 +790,6 @@ class CurrentGameViewController: UIViewController {
 			p1MoveResult.speed! *= 2
 			p1MoveResult.damageMultiplier! *= 1.25
 			
-		
 		case 10: //if p1 jumped
 			p1MoveResult.speed! *= 1
 			switch player2TagSelected.attack {
@@ -857,10 +805,8 @@ class CurrentGameViewController: UIViewController {
 			switch player2TagSelected.attack {
 			case 24,25,26: //p2 attacked high
 				p1MoveResult.defenseMultiplier! *= 0
-				
 			case 27,28,29,.none, 1: //p2 attacked low
 				p1MoveResult.defenseMultiplier! *= 1
-				
 			default:
 				break
 			}
@@ -885,10 +831,8 @@ class CurrentGameViewController: UIViewController {
 			switch player1TagSelected.attack {
 			case 14,15,16,.none, 1: //p1 attacked high
 				p2MoveResult.defenseMultiplier! *= 1
-				
 			case 17,18,19: //p1 attacked low
 				p2MoveResult.defenseMultiplier! *= 0
-				
 			default:
 				break
 			}
@@ -897,10 +841,8 @@ class CurrentGameViewController: UIViewController {
 			switch player1TagSelected.attack {
 			case 14,15,16: //p1 attacked high
 				p2MoveResult.defenseMultiplier! *= 0
-				
 			case 17,18,19,.none, 1: //p1 attacked low
 				p2MoveResult.defenseMultiplier! *= 1
-				
 			default:
 				break
 			}
@@ -932,19 +874,15 @@ class CurrentGameViewController: UIViewController {
 		DispatchQueue.main.async {
 //            self.round?.gameId = currentGame.gameId
 //            game?.roundNumber = currentGame.roundNumber
-            
 			self.gameSessionLabel.text = currentGame.gameId
-			
 			self.player1ImageView.layer.cornerRadius = 25 //half of the imageView to make it round
 			self.player1ImageView.layer.masksToBounds = true
             self.player1ImageView.downloaded(fromLink: "\(currentGame.player1AvatarUrl!)")
 //            self.player1ImageView.image = currentGame.player1Image
-			
 			self.player2ImageView.layer.cornerRadius = 25 //half of the imageView to make it round
 			self.player2ImageView.layer.masksToBounds = true
             self.player2ImageView.downloaded(fromLink: "\(currentGame.player2AvatarUrl!)")
 //            self.player2ImageView.image = currentGame.player2Image
-			
 			self.player1NameLabel.text = "\(currentGame.player1Name!)"
 			self.player1HPLabel.text = "\(currentGame.player1HP)/30"
 			
@@ -977,7 +915,6 @@ class CurrentGameViewController: UIViewController {
             switch button {
             case self.p1Button14LUp:
                 if button.animation == ButtonAnimations.SmallFire && self.p2MoveResult.defenseMultiplier! != 0 {
-                    
                     self.removeAttackButtonsAnimation(buttons: self.player1AttackButtons!)
                     if self.p1Button16HUp.cooldown <= 1 {
                         self.putAnimation(button: self.p1Button16HUp, animation: ButtonAnimations.BigFire)
@@ -1052,10 +989,8 @@ class CurrentGameViewController: UIViewController {
             }
         }
         
-        
         for button in self.player2AttackButtons! { //check p2 selected buttons and apply the necessary fire animation
             if button.selectedButton == false { continue }
-            
             switch button {
             case self.p2Button26LUp:
                 if button.animation == ButtonAnimations.SmallFire && self.p1MoveResult.defenseMultiplier! != 0 {
@@ -1143,10 +1078,8 @@ class CurrentGameViewController: UIViewController {
 	@objc func updateTurnTime() {
 		clockCounter -= 1
 		timeLeftLabel.text = "\(clockCounter)"
-		
 		if clockCounter == 0 {
 			clockTimer?.invalidate()
-            
 			setupSelectedTag()
 		}
 	}
@@ -1155,14 +1088,10 @@ class CurrentGameViewController: UIViewController {
     private func finishTurn() {
         DispatchQueue.main.async {
             self.updateButtonsAnimations()
-        
-            
             self.player1TagSelected = (nil, nil)
             self.player2TagSelected = (nil, nil)
-            
             guard let allButtons = self.allButtons else { return }
             deselectOtherButtons(buttons: allButtons)
-            
             if self.game!.player1Id == self.game!.player2Id { //if user is playing against itself
                 self.player1MovesView.isUserInteractionEnabled = true
                 self.player2MovesView.isUserInteractionEnabled = true
@@ -1185,25 +1114,18 @@ class CurrentGameViewController: UIViewController {
                     button.cooldown -= 1
                 }
             }
-            
             updateButtonsView(buttons: allButtons)
-            
             self.game?.roundNumber += 1
-            
             UserDefaults.standard.set(gameDictionaryFrom(game: self.game!), forKey: self.game!.gameId)
             UserDefaults.standard.synchronize()
-            
             self.roundNumberLabel.text = "\(self.game!.roundNumber)"
             self.clockCounter = 8
             self.timeLeftLabel.text = "\(self.clockCounter)"
-            
             self.startTurnTimer()
-            
         }
     }
 	
 	@objc func ryuStandingAnimation() { //method that gets run every 0.1 seconds and animates player1Character (ryu) depending on the assigned ryuImageName
-        
 //        self.player1Character.image = UIImage.animatedImage(with: <#T##[UIImage]#>, duration: <#T##TimeInterval#>)
 		self.player1Character.image = UIImage(named: "\(ryuImageName.0)\(ryuCounter)")
 		ryuCounter += 1
@@ -1230,7 +1152,6 @@ class CurrentGameViewController: UIViewController {
 		backgroundImageView.image = UIImage(named: "\(backgroundName)\(backgroundCounter)")
 		backgroundCounter += 1
 		if backgroundCounter == bgMaxCounter { backgroundCounter = 0 }
-		
 	}
 	
 	
@@ -1266,8 +1187,5 @@ class CurrentGameViewController: UIViewController {
 		} else { sender.selectedButton = true }
 		player1TagSelected.attack = sender.buttonTag
 	}
-	
-	
-	
 }
 
