@@ -22,7 +22,6 @@ class GameHistoryViewController: UIViewController {
     @IBOutlet weak var gameHistoryTableView: UITableView!
     @IBOutlet weak var profilePicView: UIView!
     
-    
 //MARK: Properties
     let shapeLayer = CAShapeLayer() //for expBar
     var matches:[Game] = []
@@ -61,11 +60,9 @@ class GameHistoryViewController: UIViewController {
         let gameHistoryRef = firDatabase.child(kGAMEHISTORY).child(currentUser.userID)
         gameHistoryRef.observe(.childAdded, with: { (snapshot) in
 //            print("Snapshots are... \(snapshot.children.allObjects)")
-            
             if snapshot.exists() {
                 guard let gameHistoryDic = snapshot.value as? [String: Any] else { print("fetchResult has no gameHistory exisit"); return } //will contain the gameHistoryDic that has the keys: kOPPONENTUID, kOPPONENTAVATARTURL, kHPLEFT, kGAMEID etc.
 //                print("GameDic is \(gameHistoryDic)")
-
                 let game: Game = Game.init(_dictionary: gameHistoryDic) //create then append each game in matches
                 self.matches.append(game)
             }
